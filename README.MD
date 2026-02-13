@@ -16,7 +16,7 @@ Production-ready REST API menggunakan:
 ```
 	cmd/
 	└── server/
-	└── main.go
+		└── main.go
 
 	config/
 	└── config.go
@@ -100,7 +100,7 @@ Tidak boleh import Fiber / MySQL.
 
 ---
 
-### 3️⃣ usecase
+### 3️⃣ usecase ( Bisa juga disebut Layer Service)
 Berisi:
 - Business logic
 - Auth logic
@@ -115,7 +115,7 @@ Hanya tahu interface repository.
 ### 4️⃣ infrastructure
 Berisi:
 - Database connection
-- Repository implementation
+- Repository implementation ( Penulisan Query Ada Disini)
 - Migration runner
 
 Layer ini implementasi teknis.
@@ -170,21 +170,30 @@ Buat file `.env`:
 
 1️⃣ Install dependencies
 
-``` go mod tidy ```
+```
+go mod tidy
+
+```
 
 
 2️⃣ Pastikan MySQL jalan
 
 3️⃣ Jalankan app
 
-``` go run cmd/server/main.go ```
+```
+go run cmd/server/main.go
+
+```
 
 
 ---
 
 # 🐳 Run With Docker
 
-``` docker-compose up --build ```
+```
+docker-compose up --build
+
+```
 
 
 ---
@@ -195,17 +204,26 @@ Migration menggunakan Goose.
 
 File migration ada di:
 
-``` migrations/001_create_user.sql ```
+```
+migrations/001_create_user.sql
+
+```
 
 
 Auto run migration saat startup:
 
-``` infrastructure.RunMigration(db) ```
+```
+infrastructure.RunMigration(db)
+
+```
 
 
 Manual run:
 
-``` goose -dir migrations mysql "user:pass@tcp(localhost:3306)/gpt_db" up ```
+```
+goose -dir migrations mysql "user:pass@tcp(localhost:3306)/gpt_db" up
+
+```
 
 
 
