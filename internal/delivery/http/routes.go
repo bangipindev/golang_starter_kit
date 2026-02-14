@@ -25,11 +25,11 @@ func SetupRoutes(app *fiber.App, authHandler *handler.AuthHandler) {
 	authV1 := v1.Group("/auth")
 	authV1.Post("/register", authHandler.Register)
 	authV1.Post("/login", authHandler.Login)
+	authV1.Post("/refresh", authHandler.Refresh)
 
 	// Protected Routes V1
 	protectedV1 := v1.Group("", middleware.JWTProtected(cfg.JWTSecret))
 	protectedV1.Get("/profile", authHandler.Profile)
-
 
 	// ======================================================
 	// API VERSION 2 (Contoh Future Development)

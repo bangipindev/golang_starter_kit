@@ -1,14 +1,14 @@
 package main
 
 import (
-	"log"
-
 	"gpt/config"
-	httpDelivery "gpt/internal/delivery/http"
 	"gpt/internal/delivery/http/handler"
 	"gpt/internal/infrastructure"
 	"gpt/internal/infrastructure/repository"
 	"gpt/internal/usecase"
+	"log"
+
+	httpDelivery "gpt/internal/delivery/http"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/logger"
@@ -16,7 +16,6 @@ import (
 )
 
 func main() {
-
 	// ======================
 	// Load Configuration
 	// ======================
@@ -45,7 +44,7 @@ func main() {
 	// Dependency Injection
 	// ======================
 	userRepo := repository.NewUserRepository(db)
-	authUsecase := usecase.NewAuthUsecase(userRepo, cfg.JWTSecret)
+	authUsecase := usecase.NewAuthUsecase(userRepo, cfg.JWTSecret, cfg.JWTAccessExpiry, cfg.JWTRefreshExpiry)
 	authHandler := handler.NewAuthHandler(authUsecase)
 
 	// ======================

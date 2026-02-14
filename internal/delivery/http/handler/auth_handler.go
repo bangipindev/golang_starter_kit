@@ -45,20 +45,28 @@ func (h *AuthHandler) Login(c *fiber.Ctx) error {
 		return response.Error(c, 400, "Invalid request body", err.Error())
 	}
 
-	token, err := h.authUsecase.Login(c.Context(), req.Email, req.Password)
+	res, err := h.authUsecase.Login(c.Context(), req.Email, req.Password)
 	if err != nil {
 		return response.Error(c, 401, "Invalid credentials", err.Error())
 	}
 
-	return response.Success(c, 200, "Login successful", fiber.Map{
-		"token": token,
-	})
+	user := dto.UserResponse{
+		ID:    res.User.ID,
+		Name:  res.User.Name,
+		Email: res.User.Email,
+	}
+
+	loginResponse := dto.LoginResponse{
+		User:         user,
+		AccessToken:  res.AccessToken,
+		RefreshToken: res.RefreshToken,
+	}
+
+	return response.Success(c, 200, "Login successful", loginResponse)
 }
 
 func (h *AuthHandler) Profile(c *fiber.Ctx) error {
-
 	userIDRaw := c.Locals("user_id")
-	token := c.Locals("token")
 
 	if userIDRaw == nil {
 		return response.Error(c, 401, "Unauthorized", "invalid token")
@@ -72,12 +80,27 @@ func (h *AuthHandler) Profile(c *fiber.Ctx) error {
 	}
 
 	return response.Success(c, 200, "Profile Didapatkan", fiber.Map{
-		"user": fiber.Map{
-			"id":    user.ID,
-			"name":  user.Name,
-			"email": user.Email,
-		},
-		"token": token,
+		"id":    user.ID,
+		"name":  user.Name,
+		"email": user.Email,
 	})
 }
 
+func (h *AuthHandler) Refresh(c *fiber.Ctx) error {
+	var req struct {
+		RefreshToken string `json:"refresh_token"`
+	}
+
+	if err := c.BodyParser(&req); err != nil {
+		return response.Error(c, 400, "Invalid request", err.Error())
+	}
+
+	newAccess, err := h.authUsecase.RefreshToken(c.Context(), req.RefreshToken)
+	if err != nil {
+		return response.Error(c, 401, "Invalid refresh token", err.Error())
+	}
+
+	return response.Success(c, 200, "Token refreshed", fiber.Map{
+		"access_token": newAccess,
+	})
+}
