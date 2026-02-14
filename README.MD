@@ -178,13 +178,21 @@ go mod tidy
 
 2️⃣ Pastikan MySQL jalan
 
-3️⃣ Jalankan app
+3️⃣ Jalankan app / Manual Run
 
 ```
 go run cmd/server/main.go
 
 ```
 
+---
+
+3️⃣ Hot Reload / Automatic Run
+
+```
+air
+
+```
 
 ---
 
