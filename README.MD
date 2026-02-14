@@ -288,6 +288,88 @@ Header:
 ✔ Semua dependency di inject dari main.go
 
 ---
+### FULL FLOW VISUAL
+```
+	Client
+	↓
+	Fiber Router
+	↓
+	Handler (delivery/http)
+	↓
+	Usecase (business logic)
+	↓
+	Domain (interface)
+	↓
+	Repository (infrastructure)
+	↓
+	Database (MySQL)
+	↑
+	Repository return result
+	↑
+	Usecase process
+	↑
+	Handler format response
+	↑
+	Client menerima JSON
+
+```
+---
+
+### 🔐 FLOW PROTECTED ROUTE (JWT)
+```
+	Client
+	↓
+	JWT Middleware
+	↓ (valid token?)
+	Handler.Profile
+	↓
+	Usecase.GetProfile
+	↓
+	Repository.FindByID
+	↓
+	Database
+	↑
+	Return user data
+	↑
+	Response JSON
+
+
+```
+
+Jika token invalid:
+
+```
+	Middleware stop
+	Return 401
+
+```
+---
+
+### 📊 Versi Diagram Arsitektur Clean (Conceptual)
+
+```
+	┌────────────────────┐
+	│      DELIVERY      │
+	│  (Fiber, Handler)  │
+	└─────────┬──────────┘
+				↓
+	┌────────────────────┐
+	│      USECASE       │
+	│  (Auth Service)    │
+	└─────────┬──────────┘
+				↓
+	┌────────────────────┐
+	│       DOMAIN       │
+	│ Entity + Interface │
+	└─────────┬──────────┘
+				↓
+	┌────────────────────┐
+	│   INFRASTRUCTURE   │
+	│   DB + Repository  │
+	└────────────────────┘
+
+```
+---
 
 # 📈 Production Ready Improvements
 
