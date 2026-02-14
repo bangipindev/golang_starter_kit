@@ -1,32 +1,43 @@
 package middleware
 
 import (
+	"gpt/internal/domain"
 	"strings"
 
 	"github.com/gofiber/fiber/v2"
-	"github.com/golang-jwt/jwt/v5"
 )
 
-func JWTProtected(secret string) fiber.Handler {
-    return func(c *fiber.Ctx) error {
+func AuthMiddleware(tokenService domain.TokenService) fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		authHeader := c.Get("Authorization")
+		if authHeader == "" {
+			return fiber.ErrUnauthorized
+		}
 
-        tokenString := strings.TrimPrefix(
-            c.Get("Authorization"),
-            "Bearer ",
-        )
+		tokenString := strings.TrimPrefix(authHeader, "Bearer ")
 
-        claims := jwt.MapClaims{}
+		claims, err := tokenService.ParseAccessToken(tokenString)
+		if err != nil {
+			return fiber.ErrUnauthorized
+		}
 
-        token, err := jwt.ParseWithClaims(tokenString, claims, func(token *jwt.Token) (interface{}, error) {
-            return []byte(secret), nil
-        })
+		c.Locals("user", claims)
 
-        if err != nil || !token.Valid {
-            return c.Status(401).JSON(fiber.Map{"error": "invalid token"})
-        }
+		return c.Next()
+	}
+}
 
-        c.Locals("user_id", claims["user_id"])
-		c.Locals("token", tokenString)
-        return c.Next()
-    }
+func RequireRole(role domain.Role) fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		claims, ok := c.Locals("user").(*domain.AccessClaims)
+		if !ok {
+			return fiber.ErrUnauthorized
+		}
+
+		if claims.Role != role {
+			return fiber.ErrForbidden
+		}
+
+		return c.Next()
+	}
 }

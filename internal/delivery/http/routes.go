@@ -3,13 +3,14 @@ package http
 import (
 	"gpt/config"
 	"gpt/internal/delivery/http/handler"
+	"gpt/internal/domain"
 	"gpt/internal/middleware"
 
 	"github.com/gofiber/fiber/v2"
 )
 
-func SetupRoutes(app *fiber.App, authHandler *handler.AuthHandler) {
-	cfg := config.LoadConfig()
+func SetupRoutes(app *fiber.App, cfg *config.Config, authHandler *handler.AuthHandler, tokenService domain.TokenService) {
+	// cfg := config.LoadConfig()
 
 	// =========================
 	// Base API
@@ -28,7 +29,7 @@ func SetupRoutes(app *fiber.App, authHandler *handler.AuthHandler) {
 	authV1.Post("/refresh", authHandler.Refresh)
 
 	// Protected Routes V1
-	protectedV1 := v1.Group("", middleware.JWTProtected(cfg.JWTSecret))
+	protectedV1 := v1.Group("", middleware.AuthMiddleware(tokenService))
 	protectedV1.Get("/profile", authHandler.Profile)
 
 	// ======================================================

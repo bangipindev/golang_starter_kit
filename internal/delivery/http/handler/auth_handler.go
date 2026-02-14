@@ -66,24 +66,14 @@ func (h *AuthHandler) Login(c *fiber.Ctx) error {
 }
 
 func (h *AuthHandler) Profile(c *fiber.Ctx) error {
-	userIDRaw := c.Locals("user_id")
+	claims := c.Locals("user").(*domain.AccessClaims)
 
-	if userIDRaw == nil {
-		return response.Error(c, 401, "Unauthorized", "invalid token")
-	}
-
-	userID := int64(userIDRaw.(float64)) // JWT numeric jadi float64
-
-	user, err := h.authUsecase.GetProfile(c.Context(), userID)
+	user, err := h.authUsecase.GetProfile(c.Context(), claims.UserID)
 	if err != nil {
 		return response.Error(c, 404, "User not found", err.Error())
 	}
 
-	return response.Success(c, 200, "Profile Didapatkan", fiber.Map{
-		"id":    user.ID,
-		"name":  user.Name,
-		"email": user.Email,
-	})
+	return response.Success(c, 200, "Profile Didapatkan", dto.ToUserResponse(user))
 }
 
 func (h *AuthHandler) Refresh(c *fiber.Ctx) error {

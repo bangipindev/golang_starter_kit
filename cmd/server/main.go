@@ -2,13 +2,13 @@ package main
 
 import (
 	"gpt/config"
+	"gpt/internal/delivery/http"
+	"gpt/internal/delivery/http/auth"
 	"gpt/internal/delivery/http/handler"
 	"gpt/internal/infrastructure"
 	"gpt/internal/infrastructure/repository"
 	"gpt/internal/usecase"
 	"log"
-
-	httpDelivery "gpt/internal/delivery/http"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/logger"
@@ -43,8 +43,12 @@ func main() {
 	// ======================
 	// Dependency Injection
 	// ======================
+
+	// buat JWT service dulu
+	jwtService := auth.NewJWTService(cfg.JWTSecret, cfg.JWTAccessExpiry, cfg.JWTRefreshExpiry)
+
 	userRepo := repository.NewUserRepository(db)
-	authUsecase := usecase.NewAuthUsecase(userRepo, cfg.JWTSecret, cfg.JWTAccessExpiry, cfg.JWTRefreshExpiry)
+	authUsecase := usecase.NewAuthUsecase(userRepo, jwtService)
 	authHandler := handler.NewAuthHandler(authUsecase)
 
 	// ======================
@@ -59,7 +63,7 @@ func main() {
 	// ======================
 	// Setup Routes
 	// ======================
-	httpDelivery.SetupRoutes(app, authHandler)
+	http.SetupRoutes(app, cfg, authHandler, jwtService)
 
 	// ======================
 	// Start Server

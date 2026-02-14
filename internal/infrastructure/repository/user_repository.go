@@ -15,20 +15,20 @@ func NewUserRepository(db *sql.DB) domain.UserRepository {
 }
 
 func (r *userRepository) Create(ctx context.Context, user *domain.User) error {
-	query := "INSERT INTO users(name,email,password) VALUES(?,?,?)"
+	query := "INSERT INTO users(name,email,password,role) VALUES(?,?,?,?)"
 	_, err := r.db.ExecContext(ctx, query,
-		user.Name, user.Email, user.Password)
+		user.Name, user.Email, user.Password, user.Role)
 	return err
 }
 
 func (r *userRepository) FindByEmail(ctx context.Context, email string) (*domain.User, error) {
 	row := r.db.QueryRowContext(ctx,
-		"SELECT id,name,email,password FROM users WHERE email=?",
+		"SELECT id,name,email,password, role FROM users WHERE email=?",
 		email,
 	)
 
 	var user domain.User
-	err := row.Scan(&user.ID, &user.Name, &user.Email, &user.Password)
+	err := row.Scan(&user.ID, &user.Name, &user.Email, &user.Password, &user.Role)
 	if err != nil {
 		return nil, err
 	}
@@ -38,12 +38,12 @@ func (r *userRepository) FindByEmail(ctx context.Context, email string) (*domain
 
 func (r *userRepository) FindByID(ctx context.Context, id int64) (*domain.User, error) {
 	row := r.db.QueryRowContext(ctx,
-		"SELECT id,name,email,password FROM users WHERE id=?",
+		"SELECT id,name,email,password, role FROM users WHERE id=?",
 		id,
 	)
 
 	var user domain.User
-	err := row.Scan(&user.ID, &user.Name, &user.Email, &user.Password)
+	err := row.Scan(&user.ID, &user.Name, &user.Email, &user.Password, &user.Role)
 	if err != nil {
 		return nil, err
 	}
