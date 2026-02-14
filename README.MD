@@ -175,6 +175,13 @@ go mod tidy
 
 ```
 
+Copy env.example to .env
+
+```
+ Copy env.example to .env
+
+```
+
 
 2️⃣ Pastikan MySQL jalan
 
