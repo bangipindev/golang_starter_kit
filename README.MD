@@ -352,17 +352,17 @@ Jika token invalid:
 	│      DELIVERY      │
 	│  (Fiber, Handler)  │
 	└─────────┬──────────┘
-				↓
+			  ↓
 	┌────────────────────┐
 	│      USECASE       │
 	│  (Auth Service)    │
 	└─────────┬──────────┘
-				↓
+			  ↓
 	┌────────────────────┐
 	│       DOMAIN       │
 	│ Entity + Interface │
 	└─────────┬──────────┘
-				↓
+			  ↓
 	┌────────────────────┐
 	│   INFRASTRUCTURE   │
 	│   DB + Repository  │
