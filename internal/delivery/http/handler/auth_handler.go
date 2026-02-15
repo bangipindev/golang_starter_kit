@@ -6,6 +6,7 @@ import (
 	"gpt/internal/pkg/response"
 	"gpt/internal/usecase"
 
+	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v2"
 )
 
@@ -19,11 +20,19 @@ func NewAuthHandler(authUsecase usecase.AuthUsecase) *AuthHandler {
 	}
 }
 
+var validate = validator.New()
+
 func (h *AuthHandler) Register(c *fiber.Ctx) error {
 	var req dto.RegisterRequest
 
 	if err := c.BodyParser(&req); err != nil {
 		return response.Error(c, 400, "Invalid request body", err.Error())
+	}
+
+	// Validasi struct
+	if err := validate.Struct(req); err != nil {
+		// Bisa return error validasi dengan pesan detail
+		return response.Error(c, 400, "Validation failed", err.Error())
 	}
 
 	user := &domain.User{
@@ -50,7 +59,7 @@ func (h *AuthHandler) Login(c *fiber.Ctx) error {
 		return response.Error(c, 401, "Invalid credentials", err.Error())
 	}
 
-	user := dto.UserResponse{
+	user := dto.AuthUserResponse{
 		ID:    res.User.ID,
 		Name:  res.User.Name,
 		Email: res.User.Email,
