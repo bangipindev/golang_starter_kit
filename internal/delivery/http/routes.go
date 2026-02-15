@@ -2,62 +2,40 @@ package http
 
 import (
 	"gpt/config"
-	"gpt/internal/delivery/http/handler"
-	"gpt/internal/domain"
+	"gpt/internal/container"
 	"gpt/internal/middleware"
 
 	"github.com/gofiber/fiber/v2"
 )
 
-func SetupRoutes(app *fiber.App, cfg *config.Config, authHandler *handler.AuthHandler, tokenService domain.TokenService) {
-	// cfg := config.LoadConfig()
-
-	// =========================
-	// Base API
-	// =========================
+func SetupRoutes(app *fiber.App, cfg *config.Config, container *container.Container) {
 	api := app.Group("/api")
 
 	// =========================
 	// API VERSION 1
 	// =========================
 	v1 := api.Group("/v1")
-
-	// Auth Routes V1
+	/*
+	* NO AUTH
+	 */
 	authV1 := v1.Group("/auth")
-	authV1.Post("/register", authHandler.Register)
-	authV1.Post("/login", authHandler.Login)
-	authV1.Post("/refresh", authHandler.Refresh)
+	authV1.Post("/register", container.AuthHandler.Register)
+	authV1.Post("/login", container.AuthHandler.Login)
+	authV1.Post("/refresh", container.AuthHandler.Refresh)
 
 	// Protected Routes V1
-	protectedV1 := v1.Group("", middleware.AuthMiddleware(tokenService))
-	protectedV1.Get("/profile", authHandler.Profile)
+	protectedV1 := v1.Group("", middleware.AuthMiddleware(container.TokenService))
 
-	// ======================================================
-	// API VERSION 2 (Contoh Future Development)
-	// ======================================================
+	// =====================
+	// Profile Routes
+	// =====================
+	profileGroup := protectedV1.Group("/profile")
+	profileGroup.Get("/", container.AuthHandler.Profile)
 
-	/*
-		v2 := api.Group("/v2")
-
-		// Misalnya nanti kita ubah struktur response
-		authV2 := v2.Group("/auth")
-		authV2.Post("/register", authHandler.RegisterV2)
-		authV2.Post("/login", authHandler.LoginV2)
-
-		// Protected Routes V2
-		protectedV2 := v2.Group("", middleware.JWTProtected())
-		protectedV2.Get("/profile", func(c *fiber.Ctx) error {
-			return c.JSON(fiber.Map{
-				"status":  "success",
-				"message": "JWT valid 🔐 (v2)",
-				"version": "2.0",
-			})
-		})
-
-		// Contoh perubahan di v2:
-		// - Response format berbeda
-		// - Tambah refresh token
-		// - Role-based access control
-		// - Pagination standard baru
-	*/
+	// =====================
+	// Role Routes
+	// =====================
+	roleGroup := protectedV1.Group("/roles")
+	roleGroup.Get("/", container.RoleHandler.GetRoles)
+	roleGroup.Get("/add", container.RoleHandler.Add)
 }
