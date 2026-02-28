@@ -259,7 +259,7 @@ goose -dir migrations mysql "user:pass@tcp(localhost:3306)/gpt_db" up
 
 ## Register
 
-POST `/api/v1/auth/register`
+POST `/api/auth/register`
 
 ```
 	{
@@ -274,7 +274,7 @@ POST `/api/v1/auth/register`
 
 ## Login
 
-POST `/api/v1/auth/login`
+POST `/api/auth/login`
 
 Response:
 
@@ -292,7 +292,7 @@ Response:
 
 ## Profile (Protected)
 
-GET `/api/v1/profile`
+GET `/api/profile`
 
 Header:
 
