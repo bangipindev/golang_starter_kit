@@ -163,7 +163,11 @@ Buat file `.env`:
 
 ```
 
+### INSTALL AIR 
+```
+go install github.com/air-verse/air@latest
 
+```
 ---
 
 # ▶️ Run Without Docker
