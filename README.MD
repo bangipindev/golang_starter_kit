@@ -16,45 +16,52 @@ Production-ready REST API menggunakan:
 ```
 	cmd/
 	└── server/
-		└── main.go
-
+	│	└── main.go             # Entry point aplikasi (main.go)
+	│
 	config/
-	└── config.go
-
+	└── config.go				# Konfigurasi aplikasi (env, database, dll)
+	│
 	internal/
-	├── delivery/
+	├── auth/
+	│ └── token/				# JWT, hashing, auth service
+	│
+	├── container/
+	│ └── container.go			# Dependency injection container
+	│
+	├── delivery/				# Layer HTTP (handler, routes, dto)
 	│ └── http/
 	│ ├── dto/
 	│ ├── handler/
 	│ └── routes.go
 	│
-	├── domain/
+	├── domain/					# Entity & interface (business core contract)
 	│ └── user.go
 	│
-	├── infrastructure/
+	├── infrastructure/			# Implementasi repository (DB, external service)
 	│ ├── repository/
 	│ ├── database.go
 	│ └── migrate.go
 	│
-	├── middleware/
+	├── middleware/				# HTTP middleware (Auth, logging, dll)
 	│ └── jwt_middleware.go
 	│
-	├── pkg/
+	├── pkg/					# Shared utilities (response, helper, dll)
 	│ └── response/
 	│
-	├── usecase/
-	│ └── auth.go
-	│
-	└── utils/
+	├── usecase/				# Business logic
+	  └── auth.go
 
-	migrations/
+
+	migrations/					# Database migration files
 	└── 001_create_user.sql
-
-	.env
-	docker-compose.yml
-	Dockerfile
-	go.mod
-	README.md
+	├── .air.toml           	# Konfigurasi hot reload (Air)
+	├── .env                	# Environment variables
+	├── .env.example        	# Contoh konfigurasi env
+	├── docker-compose.yml  	# Docker compose config
+	├── Dockerfile         	 	# Docker image config
+	├── go.mod              	# Go module definition
+	├── go.sum              	# Dependency checksum
+	└── README.md           	# Dokumentasi project
 
 ```
 
