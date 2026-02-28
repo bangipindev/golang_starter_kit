@@ -15,15 +15,15 @@ Production-ready REST API menggunakan:
 # 📦 Project Structure
 ```
 	cmd/
-	└── server/
-	│	└── main.go             # Entry point aplikasi (main.go)
+	└─server/
+	│ └── main.go             # Entry point aplikasi (main.go)
 	│
-	config/
-	└── config.go				# Konfigurasi aplikasi (env, database, dll)
+	├─config/
+	│ └── config.go				# Konfigurasi aplikasi (env, database, dll)
 	│
-	internal/
-	├── auth/
-	│ └── token/				# JWT, hashing, auth service
+	├──internal/
+	│ └──auth/
+	│ 	└── token/				# JWT, hashing, auth service
 	│
 	├── container/
 	│ └── container.go			# Dependency injection container
