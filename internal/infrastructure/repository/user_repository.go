@@ -14,6 +14,32 @@ func NewUserRepository(db *sql.DB) domain.UserRepository {
 	return &userRepository{db}
 }
 
+func (r *userRepository) GetAll(ctx context.Context) ([]*domain.User, error) {
+	rows, err := r.db.QueryContext(ctx, "SELECT id, name, email, role FROM users")
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var users []*domain.User
+
+	for rows.Next() {
+		var user domain.User
+
+		if err := rows.Scan(&user.ID, &user.Name, &user.Email, &user.Role); err != nil {
+			return nil, err
+		}
+
+		users = append(users, &user)
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return users, nil
+}
+
 func (r *userRepository) Create(ctx context.Context, user *domain.User) error {
 	query := "INSERT INTO users(name,email,password,role) VALUES(?,?,?,?)"
 	_, err := r.db.ExecContext(ctx, query,

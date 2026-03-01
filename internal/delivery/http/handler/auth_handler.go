@@ -82,7 +82,7 @@ func (h *AuthHandler) Profile(c *fiber.Ctx) error {
 		return response.Error(c, 404, "User not found", err.Error())
 	}
 
-	return response.Success(c, 200, "Profile Didapatkan", dto.ToUserResponse(user))
+	return response.Success(c, 200, "Profile Didapatkan", dto.ToAuthUserResponse(user))
 }
 
 func (h *AuthHandler) Refresh(c *fiber.Ctx) error {

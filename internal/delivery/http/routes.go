@@ -27,6 +27,12 @@ func SetupRoutes(app *fiber.App, cfg *config.Config, container *container.Contai
 	profileGroup.Get("/", container.AuthHandler.Profile)
 
 	// =====================
+	// User Routes
+	// =====================
+	userGroup := protected.Group("/users")
+	userGroup.Get("/", container.UserHandler.GetAll)
+
+	// =====================
 	// Role Routes
 	// =====================
 	roleGroup := protected.Group("/roles")

@@ -15,11 +15,37 @@ type AuthUserResponse struct {
 	Role  domain.Role `json:"role"`
 }
 
-func ToUserResponse(user *domain.User) *AuthUserResponse {
+func ToAuthUserResponse(user *domain.User) *AuthUserResponse {
 	return &AuthUserResponse{
 		ID:    user.ID,
 		Name:  user.Name,
 		Email: user.Email,
 		Role:  user.Role,
 	}
+}
+
+type UserResponse struct {
+	ID    int64       `json:"id"`
+	Name  string      `json:"name"`
+	Email string      `json:"email"`
+	Role  domain.Role `json:"role"`
+}
+
+func ToUserResponse(user *domain.User) UserResponse {
+	return UserResponse{
+		ID:    user.ID,
+		Name:  user.Name,
+		Email: user.Email,
+		Role:  user.Role,
+	}
+}
+
+func ToUserResponseList(users []*domain.User) []UserResponse {
+	result := make([]UserResponse, 0, len(users))
+
+	for _, u := range users {
+		result = append(result, ToUserResponse(u))
+	}
+
+	return result
 }
