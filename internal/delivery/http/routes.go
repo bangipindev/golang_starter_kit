@@ -21,16 +21,17 @@ func SetupRoutes(app *fiber.App, cfg *config.Config, container *container.Contai
 	protected := api.Group("", middleware.AuthMiddleware(container.TokenService))
 
 	// =====================
-	// Profile Routes
-	// =====================
-	profileGroup := protected.Group("/profile")
-	profileGroup.Get("/", container.AuthHandler.Profile)
-
-	// =====================
 	// User Routes
 	// =====================
 	userGroup := protected.Group("/users")
 	userGroup.Get("/", container.UserHandler.GetAll)
+	userGroup.Post("/add", container.UserHandler.Create)
+
+	// =====================
+	// Profile Routes
+	// =====================
+	profileGroup := protected.Group("/profile")
+	profileGroup.Get("/", container.AuthHandler.Profile)
 
 	// =====================
 	// Role Routes

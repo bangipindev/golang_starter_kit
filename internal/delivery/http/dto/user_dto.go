@@ -1,11 +1,20 @@
 package dto
 
-import "gpt/internal/domain"
+import (
+	"fmt"
+	"gpt/internal/domain"
+)
 
 type RegisterRequest struct {
 	Name     string `json:"name" validate:"required"`
 	Email    string `json:"email" validate:"required,email"`
 	Password string `json:"password" validate:"required,min=6"`
+}
+type UserRequest struct {
+	Name     string `json:"name" validate:"required"`
+	Email    string `json:"email" validate:"required,email"`
+	Password string `json:"password" validate:"required,min=6"`
+	Role     string `json:"role" validate:"required,oneof=admin user"`
 }
 
 type AuthUserResponse struct {
@@ -48,4 +57,22 @@ func ToUserResponseList(users []*domain.User) []UserResponse {
 	}
 
 	return result
+}
+
+func (r *UserRequest) ToDomain() (*domain.User, error) {
+	role := domain.Role(r.Role)
+
+	// Optional: validasi manual jika perlu
+	switch role {
+	case domain.RoleAdmin, domain.RoleUser:
+	default:
+		return nil, fmt.Errorf("invalid role")
+	}
+
+	return &domain.User{
+		Name:     r.Name,
+		Email:    r.Email,
+		Password: r.Password, // nanti di-hash di usecase
+		Role:     role,
+	}, nil
 }
