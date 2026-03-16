@@ -23,33 +23,33 @@ func (h *UserHandler) GetAll(c *fiber.Ctx) error {
 
 	users, err := h.userUsecase.GetAll(ctx)
 	if err != nil {
-		return response.Error(c, 500, "Internal Server Error", err.Error())
+		return response.HandleError(c, err)
 	}
 
 	userResponses := dto.ToUserResponseList(users)
-	return response.Success(c, 200, "Successfully", userResponses)
+	return response.SuccessWithStatus(c, fiber.StatusOK, "Successfully", userResponses)
 }
 
 func (h *UserHandler) Create(c *fiber.Ctx) error {
 	var req dto.UserRequest
 
 	if err := c.BodyParser(&req); err != nil {
-		return response.Error(c, 400, "Invalid request", err.Error())
+		return response.HandleError(c, response.ErrorBadRequest)
 	}
 
 	// Validasi struct (pakai validator kalau ada)
 	if err := validate.Struct(req); err != nil {
-		return response.Error(c, 400, "Validation error", err.Error())
+		return response.ValidationError(c, err)
 	}
 
 	user, err := req.ToDomain()
 	if err != nil {
-		return response.Error(c, 400, "Invalid role", err.Error())
+		return response.HandleError(c, response.ErrorBadRequest)
 	}
 
 	if err := h.userUsecase.Create(c.Context(), user); err != nil {
-		return response.Error(c, 500, "Failed to create user", err.Error())
+		return response.HandleError(c, err)
 	}
 
-	return response.Success(c, 201, "User created", nil)
+	return response.SuccessWithStatus(c, fiber.StatusCreated, "User created", nil)
 }

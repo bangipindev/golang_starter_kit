@@ -2,13 +2,13 @@ package http
 
 import (
 	"gpt/config"
-	"gpt/internal/container"
+	base "gpt/internal/container"
 	"gpt/internal/middleware"
 
 	"github.com/gofiber/fiber/v2"
 )
 
-func SetupRoutes(app *fiber.App, cfg *config.Config, container *container.Container) {
+func SetupRoutes(app *fiber.App, cfg *config.Config, container *base.Container) {
 	api := app.Group("/api")
 
 	auth := api.Group("/auth")
