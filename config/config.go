@@ -8,16 +8,26 @@ import (
 )
 
 type Config struct {
-	AppMode          string
+	AppMode string
+	AppPort string
+
 	DBHost           string
 	DBPort           string
 	DBUser           string
 	DBPass           string
 	DBName           string
 	JWTSecret        string
-	AppPort          string
 	JWTAccessExpiry  time.Duration
 	JWTRefreshExpiry time.Duration
+
+	DBPool DBConnectionPoolConfig
+}
+
+type DBConnectionPoolConfig struct {
+	MaxIdleConnections    int
+	MaxOpenConnections    int
+	MaxIdleTime           time.Duration
+	MaxConnectionLifetime time.Duration
 }
 
 func LoadConfig() *Config {
@@ -35,15 +45,23 @@ func LoadConfig() *Config {
 	}
 
 	return &Config{
-		AppMode:          viper.GetString("APP_MODE"),
+		AppMode: viper.GetString("APP_MODE"),
+		AppPort: viper.GetString("APP_PORT"),
+
 		DBHost:           viper.GetString("DB_HOST"),
 		DBPort:           viper.GetString("DB_PORT"),
 		DBUser:           viper.GetString("DB_USER"),
 		DBPass:           viper.GetString("DB_PASS"),
 		DBName:           viper.GetString("DB_NAME"),
 		JWTSecret:        viper.GetString("JWT_SECRET"),
-		AppPort:          viper.GetString("APP_PORT"),
 		JWTAccessExpiry:  accessExp,
 		JWTRefreshExpiry: refreshExp,
+
+		DBPool: DBConnectionPoolConfig{
+			MaxIdleConnections:    viper.GetInt("MAX_IDLE_CONNECTIONS"),
+			MaxOpenConnections:    viper.GetInt("MAX_OPEN_CONNECTIONS"),
+			MaxIdleTime:           time.Duration(viper.GetInt("MAX_IDLE_TIME")) * time.Minute,
+			MaxConnectionLifetime: time.Duration(viper.GetInt("MAX_CONNECTION_LIFETIME")) * time.Minute,
+		},
 	}
 }

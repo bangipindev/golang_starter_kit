@@ -17,5 +17,16 @@ func InitDB(cfg *config.Config) (*sql.DB, error) {
 		cfg.DBName,
 	)
 
-	return sql.Open("mysql", dsn)
+	db, err := sql.Open("mysql", dsn)
+	if err != nil {
+		return nil, err
+	}
+
+	// APPLY CONNECTION POOL
+	db.SetMaxIdleConns(cfg.DBPool.MaxIdleConnections)
+	db.SetMaxOpenConns(cfg.DBPool.MaxOpenConnections)
+	db.SetConnMaxIdleTime(cfg.DBPool.MaxIdleTime)
+	db.SetConnMaxLifetime(cfg.DBPool.MaxConnectionLifetime)
+
+	return db, nil
 }
