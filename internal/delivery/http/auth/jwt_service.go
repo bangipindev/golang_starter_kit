@@ -1,8 +1,8 @@
 package auth
 
 import (
-	"gpt/internal/auth/token"
 	"gpt/internal/domain"
+	"gpt/internal/utils/token"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"

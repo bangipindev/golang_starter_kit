@@ -26,13 +26,13 @@ func (h *AuthHandler) Register(c *fiber.Ctx) error {
 	var req dto.RegisterRequest
 
 	if err := c.BodyParser(&req); err != nil {
-		return response.Error(c, 400, "Invalid request body", err.Error())
+		return response.HandleError(c, response.ErrorBadRequest)
 	}
 
 	// Validasi struct
 	if err := validate.Struct(req); err != nil {
 		// Bisa return error validasi dengan pesan detail
-		return response.Error(c, 400, "Validation failed", err.Error())
+		return response.ValidationError(c, err)
 	}
 
 	user := &domain.User{
@@ -42,21 +42,26 @@ func (h *AuthHandler) Register(c *fiber.Ctx) error {
 	}
 
 	if err := h.authUsecase.Register(c.Context(), user); err != nil {
-		return response.Error(c, 500, "Failed to register user", err.Error())
+		return response.HandleError(c, err)
 	}
 
-	return response.Success(c, 201, "User registered successfully", user)
+	return response.SuccessWithStatus(c, fiber.StatusCreated, "User registered successfully", user)
 }
 
 func (h *AuthHandler) Login(c *fiber.Ctx) error {
 	var req dto.LoginRequest
 	if err := c.BodyParser(&req); err != nil {
-		return response.Error(c, 400, "Invalid request body", err.Error())
+		return response.HandleError(c, response.ErrorBadRequest)
+	}
+
+	// validasi request
+	if err := validate.Struct(req); err != nil {
+		return response.ValidationError(c, err)
 	}
 
 	res, err := h.authUsecase.Login(c.Context(), req.Email, req.Password)
 	if err != nil {
-		return response.Error(c, 401, "Invalid credentials", err.Error())
+		return response.HandleError(c, err)
 	}
 
 	user := dto.AuthUserResponse{
@@ -71,7 +76,7 @@ func (h *AuthHandler) Login(c *fiber.Ctx) error {
 		RefreshToken: res.RefreshToken,
 	}
 
-	return response.Success(c, 200, "Login successful", loginResponse)
+	return response.Success(c, "Login successful", loginResponse)
 }
 
 func (h *AuthHandler) Profile(c *fiber.Ctx) error {
@@ -79,27 +84,30 @@ func (h *AuthHandler) Profile(c *fiber.Ctx) error {
 
 	user, err := h.authUsecase.GetProfile(c.Context(), claims.UserID)
 	if err != nil {
-		return response.Error(c, 404, "User not found", err.Error())
+		return response.HandleError(c, response.ErrNotFound)
 	}
 
-	return response.Success(c, 200, "Profile Didapatkan", dto.ToUserResponse(user))
+	return response.Success(c, "Profile retrieved successfully", dto.ToAuthUserResponse(user))
 }
 
 func (h *AuthHandler) Refresh(c *fiber.Ctx) error {
-	var req struct {
-		RefreshToken string `json:"refresh_token"`
-	}
+	var req dto.RefreshTokenRequest
 
 	if err := c.BodyParser(&req); err != nil {
-		return response.Error(c, 400, "Invalid request", err.Error())
+		return response.HandleError(c, response.ErrorBadRequest)
+	}
+
+	// validasi request
+	if err := validate.Struct(req); err != nil {
+		return response.ValidationError(c, err)
 	}
 
 	newAccess, err := h.authUsecase.RefreshToken(c.Context(), req.RefreshToken)
 	if err != nil {
-		return response.Error(c, 401, "Invalid refresh token", err.Error())
+		return response.HandleError(c, err)
 	}
 
-	return response.Success(c, 200, "Token refreshed", fiber.Map{
+	return response.Success(c, "Token refreshed", fiber.Map{
 		"access_token": newAccess,
 	})
 }

@@ -12,8 +12,9 @@ import (
 
 type Container struct {
 	AuthHandler  *handler.AuthHandler
-	RoleHandler  *handler.RolesHandler
 	TokenService domain.TokenService
+	RoleHandler  *handler.RolesHandler
+	UserHandler  *handler.UserHandler
 }
 
 func NewContainer(db *sql.DB, cfg *config.Config) *Container {
@@ -24,10 +25,12 @@ func NewContainer(db *sql.DB, cfg *config.Config) *Container {
 
 	authUsecase := usecase.NewAuthUsecase(userRepo, jwtService)
 	roleUsecase := usecase.NewRoleUsecase(roleRepo)
+	userUsecase := usecase.NewUserUsecase(userRepo)
 
 	return &Container{
+		TokenService: jwtService,
 		AuthHandler:  handler.NewAuthHandler(authUsecase),
 		RoleHandler:  handler.NewRolesHandler(roleUsecase),
-		TokenService: jwtService,
+		UserHandler:  handler.NewUserHandler(userUsecase),
 	}
 }

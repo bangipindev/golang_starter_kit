@@ -2,8 +2,8 @@ package usecase
 
 import (
 	"context"
-	"errors"
 	"gpt/internal/domain"
+	"gpt/internal/pkg/response"
 
 	"golang.org/x/crypto/bcrypt"
 )
@@ -34,9 +34,13 @@ func NewAuthUsecase(repo domain.UserRepository, tokenSvc domain.TokenService) Au
 }
 
 func (s *authUsecase) Register(ctx context.Context, user *domain.User) error {
-	existing, _ := s.userRepo.FindByEmail(ctx, user.Email)
+	existing, err := s.userRepo.FindByEmail(ctx, user.Email)
+	if err != nil {
+		return err
+	}
+
 	if existing != nil {
-		return errors.New("email already registered")
+		return response.ErrEmailAlreadyUsed
 	}
 
 	hashed, err := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
@@ -56,11 +60,11 @@ func (s *authUsecase) Register(ctx context.Context, user *domain.User) error {
 func (s *authUsecase) Login(ctx context.Context, email, password string) (*LoginResponse, error) {
 	user, err := s.userRepo.FindByEmail(ctx, email)
 	if err != nil {
-		return nil, errors.New("invalid credentials")
+		return nil, response.ErrNotFound
 	}
 
 	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password)); err != nil {
-		return nil, errors.New("invalid credentials")
+		return nil, response.ErrPasswordNotMatch
 	}
 
 	accessToken, err := s.tokenSvc.GenerateAccessToken(user)
@@ -85,7 +89,7 @@ func (s *authUsecase) Login(ctx context.Context, email, password string) (*Login
 func (s *authUsecase) GetProfile(ctx context.Context, userID int64) (*domain.User, error) {
 	user, err := s.userRepo.FindByID(ctx, userID)
 	if err != nil {
-		return nil, errors.New("user not found")
+		return nil, response.ErrNotFound
 	}
 
 	user.Password = ""
@@ -94,13 +98,14 @@ func (s *authUsecase) GetProfile(ctx context.Context, userID int64) (*domain.Use
 
 func (s *authUsecase) RefreshToken(ctx context.Context, refreshToken string) (string, error) {
 	userID, err := s.tokenSvc.ParseRefreshToken(refreshToken)
+
 	if err != nil {
-		return "", errors.New("invalid refresh token")
+		return "", response.ErrorRefreshTokenInvalid
 	}
 
 	user, err := s.userRepo.FindByID(ctx, userID)
 	if err != nil {
-		return "", errors.New("user not found")
+		return "", response.ErrNotFound
 	}
 
 	return s.tokenSvc.GenerateAccessToken(user)
