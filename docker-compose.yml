@@ -6,29 +6,38 @@ services:
     container_name: gpt_app
     ports:
       - "3000:3000"
+    env_file:
+      - .env
+    restart: always
+    networks:
+      - gpt_network
     depends_on:
       - mysql
-    environment:
-      DB_HOST: mysql
-      DB_PORT: 3306
-      DB_USER: root
-      DB_PASS: root
-      DB_NAME: gpt_db
-      JWT_SECRET: supersecretkey123
-      APP_PORT: 3000
-    restart: always
 
   mysql:
     image: mysql:8.0
     container_name: gpt_mysql
     restart: always
-    environment:
-      MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: gpt_db
+    env_file:
+      - .env
     ports:
-      - "3307:3306"
+      - "33064:3306"
     volumes:
       - mysql_data:/var/lib/mysql
+    command:
+      - --innodb-buffer-pool-size=512M
+      - --max-connections=300
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - gpt_network
 
 volumes:
   mysql_data:
+
+networks:
+  gpt_network:
+    driver: bridge

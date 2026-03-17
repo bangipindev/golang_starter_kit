@@ -31,8 +31,10 @@ type DBConnectionPoolConfig struct {
 }
 
 func LoadConfig() *Config {
-	viper.SetConfigFile(".env")
-	viper.ReadInConfig()
+	// viper.SetConfigFile(".env")
+	// viper.ReadInConfig()
+	_ = godotenv.Load()
+	viper.AutomaticEnv()
 	accessExp, _ := time.ParseDuration(viper.GetString("JWT_ACCESS_EXPIRY"))
 	refreshExp, _ := time.ParseDuration(viper.GetString("JWT_REFRESH_EXPIRY"))
 
