@@ -4,6 +4,9 @@ services:
   app:
     build: .
     container_name: gpt_app
+    volumes:
+      - .:/app
+    command: ["go", "run", "cmd/server/main.go"]
     ports:
       - "3000:3000"
     env_file:
@@ -12,7 +15,8 @@ services:
     networks:
       - gpt_network
     depends_on:
-      - mysql
+      mysql:
+        condition: service_healthy
   
   mysql:
     image: mysql:8.0

@@ -4,6 +4,7 @@ import (
 	"context"
 	"gpt/internal/domain"
 	"gpt/internal/pkg/response"
+	"fmt"
 
 	"golang.org/x/crypto/bcrypt"
 )
@@ -49,10 +50,9 @@ func (s *authUsecase) Register(ctx context.Context, user *domain.User) error {
 	}
 
 	user.Password = string(hashed)
+	user.Role = domain.RoleUser
 
-	if user.Role == "" {
-		user.Role = domain.RoleUser
-	}
+	fmt.Printf("%+v\n", user)
 
 	return s.userRepo.Create(ctx, user)
 }
