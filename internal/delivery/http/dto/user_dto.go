@@ -33,6 +33,29 @@ func ToAuthUserResponse(user *domain.User) *AuthUserResponse {
 	}
 }
 
+type UpdateUserRequest struct {
+	Name     string  `json:"name" validate:"required"`
+	Email    string  `json:"email" validate:"required,email"`
+	Password *string `json:"password" validate:"omitempty,min=6"`
+	Role     string  `json:"role" validate:"required,oneof=admin user"`
+}
+
+type UpdateUserResponse struct {
+	ID    int64       `json:"id"`
+	Name  string      `json:"name"`
+	Email string      `json:"email"`
+	Role  domain.Role `json:"role"`
+}
+
+func ToUpdateUserResponse(user *domain.User) *UpdateUserResponse {
+	return &UpdateUserResponse{
+		ID:    user.ID,
+		Name:  user.Name,
+		Email: user.Email,
+		Role:  user.Role,
+	}
+}
+
 type UserResponse struct {
 	ID    int64       `json:"id"`
 	Name  string      `json:"name"`

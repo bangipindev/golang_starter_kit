@@ -2,8 +2,10 @@ package handler
 
 import (
 	"gpt/internal/delivery/http/dto"
+	"gpt/internal/domain"
 	"gpt/internal/pkg/response"
 	"gpt/internal/usecase"
+	"strconv"
 
 	"github.com/gofiber/fiber/v2"
 )
@@ -52,4 +54,55 @@ func (h *UserHandler) Create(c *fiber.Ctx) error {
 	}
 
 	return response.SuccessWithStatus(c, fiber.StatusCreated, "User created", nil)
+}
+
+func (h *UserHandler) Update(c *fiber.Ctx) error {
+	idParam := c.Params("id")
+
+	id, err := strconv.ParseInt(idParam, 10, 64)
+	if err != nil {
+		return response.HandleError(c, response.ErrorBadRequest)
+	}
+
+	var req dto.UpdateUserRequest
+
+	if err := c.BodyParser(&req); err != nil {
+		return response.HandleError(c, response.ErrorBadRequest)
+	}
+
+	if err := validate.Struct(req); err != nil {
+		return response.ValidationError(c, err)
+	}
+
+	user := &domain.User{
+		ID:    id,
+		Name:  req.Name,
+		Email: req.Email,
+		Role:  domain.Role(req.Role),
+	}
+
+	if req.Password != nil {
+		user.Password = *req.Password
+	}
+
+	if err := h.userUsecase.Update(c.Context(), user); err != nil {
+		return response.HandleError(c, err)
+	}
+
+	return response.SuccessWithStatus(c, fiber.StatusOK, "User updated successfully", dto.ToUpdateUserResponse(user))
+}
+
+func (h *UserHandler) Delete(c *fiber.Ctx) error {
+	idParam := c.Params("id")
+
+	id, err := strconv.ParseInt(idParam, 10, 64)
+	if err != nil {
+		return response.HandleError(c, response.ErrorBadRequest)
+	}
+
+	if err := h.userUsecase.Delete(c.Context(), id); err != nil {
+		return response.HandleError(c, err)
+	}
+
+	return response.SuccessWithStatus(c, fiber.StatusOK, "User deleted successfully", nil)
 }

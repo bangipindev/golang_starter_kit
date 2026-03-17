@@ -26,6 +26,8 @@ func SetupRoutes(app *fiber.App, cfg *config.Config, container *base.Container) 
 	userGroup := protected.Group("/users")
 	userGroup.Get("/", container.UserHandler.GetAll)
 	userGroup.Post("/add", container.UserHandler.Create)
+	userGroup.Put("/:id", container.UserHandler.Update)
+	userGroup.Delete("/:id", container.UserHandler.Delete)
 
 	// =====================
 	// Profile Routes
