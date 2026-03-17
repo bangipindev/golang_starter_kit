@@ -36,8 +36,13 @@ func (s *userUsecase) GetAll(ctx context.Context) ([]*domain.User, error) {
 
 func (u *userUsecase) Create(ctx context.Context, user *domain.User) error {
 	existing, err := u.userRepo.FindByEmail(ctx, user.Email)
-	if err != nil || existing == nil {
+
+	if existing != nil {
 		return response.ErrEmailAlreadyUsed
+	}
+
+	if err != nil {
+		return err
 	}
 
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
