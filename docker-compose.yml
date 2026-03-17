@@ -1,6 +1,19 @@
 version: "3.9"
 
 services:
+  app:
+    build: .
+    container_name: gpt_app
+    ports:
+      - "3000:3000"
+    env_file:
+      - .env
+    restart: always
+    networks:
+      - gpt_network
+    depends_on:
+      - mysql
+  
   mysql:
     image: mysql:8.0
     container_name: gpt_mysql
@@ -21,19 +34,6 @@ services:
       retries: 5
     networks:
       - gpt_network
-
-  app:
-    build: .
-    container_name: gpt_app
-    ports:
-      - "3000:3000"
-    env_file:
-      - .env
-    restart: always
-    networks:
-      - gpt_network
-    depends_on:
-      - mysql
 
 volumes:
   mysql_data:
