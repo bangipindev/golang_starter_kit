@@ -3,6 +3,7 @@ package infrastructure
 import (
 	"log"
 	"os"
+	"string"
 
 	"github.com/golang-migrate/migrate/v4"
 	_ "github.com/golang-migrate/migrate/v4/database/mysql"

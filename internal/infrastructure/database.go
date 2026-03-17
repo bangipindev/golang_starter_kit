@@ -30,3 +30,15 @@ func InitDB(cfg *config.Config) (*sql.DB, error) {
 
 	return db, nil
 }
+
+func WaitForDB(db *sql.DB) {
+	for i := 0; i < 10; i++ {
+		if err := db.Ping(); err == nil {
+			log.Println("Database connected")
+			return
+		}
+		log.Println("Waiting for DB...")
+		time.Sleep(2 * time.Second)
+	}
+	log.Fatal("Database not ready")
+}

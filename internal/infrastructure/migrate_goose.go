@@ -3,6 +3,7 @@ package infrastructure
 import (
 	"database/sql"
 	"log"
+	"os"
 
 	"github.com/pressly/goose/v3"
 )
