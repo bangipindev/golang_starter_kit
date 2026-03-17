@@ -24,6 +24,10 @@ func InitDB(cfg *config.Config) (*sql.DB, error) {
 		return nil, err
 	}
 
+	if err := db.Ping(); err != nil {
+		return nil, err
+	}
+
 	// APPLY CONNECTION POOL
 	db.SetMaxIdleConns(cfg.DBPool.MaxIdleConnections)
 	db.SetMaxOpenConns(cfg.DBPool.MaxOpenConnections)
@@ -31,6 +35,17 @@ func InitDB(cfg *config.Config) (*sql.DB, error) {
 	db.SetConnMaxLifetime(cfg.DBPool.MaxConnectionLifetime)
 
 	return db, nil
+}
+
+func BuildDBURL(cfg *config.Config) string {
+	return fmt.Sprintf(
+		"mysql://%s:%s@tcp(%s:%s)/%s?multiStatements=true",
+		cfg.DBUser,
+		cfg.DBPass,
+		cfg.DBHost,
+		cfg.DBPort,
+		cfg.DBName,
+	)
 }
 
 func WaitForDB(db *sql.DB) {

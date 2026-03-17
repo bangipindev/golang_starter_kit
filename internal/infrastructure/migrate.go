@@ -9,7 +9,7 @@ import (
 	_ "github.com/golang-migrate/migrate/v4/source/file"
 )
 
-func RunMigration(dbURL string, action string) {
+func RunMigrations(dbURL, action string) {
 	if action == "" {
 		action = "up"
 	}
