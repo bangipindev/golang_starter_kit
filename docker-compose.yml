@@ -4,9 +4,9 @@ services:
   app:
     build: .
     container_name: gpt_app
-    volumes:
-      - .:/app
-    command: ["go", "run", "cmd/server/main.go"]
+    # volumes:
+    #   - .:/app
+    # command: ["go", "run", "cmd/server/main.go"]
     ports:
       - "3000:3000"
     env_file:
