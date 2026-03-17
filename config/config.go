@@ -12,11 +12,12 @@ type Config struct {
 	AppMode string
 	AppPort string
 
-	DBHost           string
-	DBPort           string
-	DBUser           string
-	DBPass           string
-	DBName           string
+	RunMigration bool
+	DBHost       string
+	DBPort       string
+	DBUser       string
+	DBPass       string
+	DBName       string
 	JWTSecret        string
 	JWTAccessExpiry  time.Duration
 	JWTRefreshExpiry time.Duration
@@ -51,6 +52,7 @@ func LoadConfig() *Config {
 		AppMode: viper.GetString("APP_MODE"),
 		AppPort: viper.GetString("APP_PORT"),
 
+		RunMigration: 	viper.GetBool("RUN_MIGRATION"),
 		DBHost:           viper.GetString("DB_HOST"),
 		DBPort:           viper.GetString("DB_PORT"),
 		DBUser:           viper.GetString("DB_USER"),

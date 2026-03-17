@@ -20,15 +20,25 @@ func main() {
 		log.Fatal(err)
 	}
 
-	if cfg.AppMode == "dev" {
+	mode := cfg.AppMode
+
+	log.Printf("Server running in %s mode", strings.ToUpper(mode))
+
+	if cfg.RunMigration {
+		infrastructure.WaitForDB(db)
 		infrastructure.RunMigrations(db)
-		log.Println("Congrats...! Server Running in DEV mode")
-	} else if cfg.AppMode == "staging" {
-		infrastructure.RunMigrations(db)
-		log.Println("Congrats...! Server Running in STAGING mode")
-	} else {
-		log.Println("Congrats...! Server Running in PRODUCTION mode")
+		infrastructure.RunSeed(db)
+		log.Println("Migration executed")
 	}
+	// if cfg.AppMode == "dev" {
+	// 	infrastructure.RunMigrations(db)
+	// 	log.Println("Congrats...! Server Running in DEV mode")
+	// } else if cfg.AppMode == "staging" {
+	// 	infrastructure.RunMigrations(db)
+	// 	log.Println("Congrats...! Server Running in STAGING mode")
+	// } else {
+	// 	log.Println("Congrats...! Server Running in PRODUCTION mode")
+	// }
 
 	container := container.NewContainer(db, cfg)
 
