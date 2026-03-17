@@ -397,6 +397,11 @@ Jika token invalid:
 ```
 ---
 
+### CREATE NEW FILE MIGRATIONS
+```
+ migrate create -ext sql -dir migrations -seq create_new_file
+
+```
 # 📈 Production Ready Improvements
 
 - Add refresh token

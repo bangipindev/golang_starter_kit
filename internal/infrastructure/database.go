@@ -4,6 +4,8 @@ import (
 	"database/sql"
 	"fmt"
 	"gpt/config"
+	"log"
+	"time"
 
 	_ "github.com/go-sql-driver/mysql"
 )
@@ -22,6 +24,10 @@ func InitDB(cfg *config.Config) (*sql.DB, error) {
 		return nil, err
 	}
 
+	if err := db.Ping(); err != nil {
+		return nil, err
+	}
+
 	// APPLY CONNECTION POOL
 	db.SetMaxIdleConns(cfg.DBPool.MaxIdleConnections)
 	db.SetMaxOpenConns(cfg.DBPool.MaxOpenConnections)
@@ -29,4 +35,27 @@ func InitDB(cfg *config.Config) (*sql.DB, error) {
 	db.SetConnMaxLifetime(cfg.DBPool.MaxConnectionLifetime)
 
 	return db, nil
+}
+
+func BuildDBURL(cfg *config.Config) string {
+	return fmt.Sprintf(
+		"mysql://%s:%s@tcp(%s:%s)/%s?multiStatements=true",
+		cfg.DBUser,
+		cfg.DBPass,
+		cfg.DBHost,
+		cfg.DBPort,
+		cfg.DBName,
+	)
+}
+
+func WaitForDB(db *sql.DB) {
+	for i := 0; i < 10; i++ {
+		if err := db.Ping(); err == nil {
+			log.Println("Database connected")
+			return
+		}
+		log.Println("Waiting for DB...")
+		time.Sleep(2 * time.Second)
+	}
+	log.Fatal("Database not ready")
 }
