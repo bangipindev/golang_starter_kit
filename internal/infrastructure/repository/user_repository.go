@@ -57,6 +57,9 @@ func (r *userRepository) FindByEmail(ctx context.Context, email string) (*domain
 	var user domain.User
 	err := row.Scan(&user.ID, &user.Name, &user.Email, &user.Password, &user.Role)
 	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, nil
+		}
 		return nil, err
 	}
 

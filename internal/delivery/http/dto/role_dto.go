@@ -8,14 +8,12 @@ type RolesRequest struct {
 }
 
 type RolesResponse struct {
-	ID        int64  `json:"id"`
 	Name      string `json:"name"`
 	GuardName string `json:"guard_name"`
 }
 
 func ToRolesResponse(roles *domain.Roles) *RolesResponse {
 	return &RolesResponse{
-		ID:        roles.ID,
 		Name:      roles.Name,
 		GuardName: roles.GuardName,
 	}

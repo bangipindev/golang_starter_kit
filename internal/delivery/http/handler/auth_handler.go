@@ -68,6 +68,7 @@ func (h *AuthHandler) Login(c *fiber.Ctx) error {
 		ID:    res.User.ID,
 		Name:  res.User.Name,
 		Email: res.User.Email,
+		Role:  res.User.Role,
 	}
 
 	loginResponse := dto.LoginResponse{
