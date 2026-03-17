@@ -2,9 +2,9 @@ package usecase
 
 import (
 	"context"
+	"database/sql"
 	"gpt/internal/domain"
 	"gpt/internal/pkg/response"
-	"fmt"
 
 	"golang.org/x/crypto/bcrypt"
 )
@@ -36,7 +36,7 @@ func NewAuthUsecase(repo domain.UserRepository, tokenSvc domain.TokenService) Au
 
 func (s *authUsecase) Register(ctx context.Context, user *domain.User) error {
 	existing, err := s.userRepo.FindByEmail(ctx, user.Email)
-	if err != nil {
+	if err != nil && err != sql.ErrNoRows {
 		return err
 	}
 
@@ -51,8 +51,6 @@ func (s *authUsecase) Register(ctx context.Context, user *domain.User) error {
 
 	user.Password = string(hashed)
 	user.Role = domain.RoleUser
-
-	fmt.Printf("%+v\n", user)
 
 	return s.userRepo.Create(ctx, user)
 }
@@ -98,7 +96,6 @@ func (s *authUsecase) GetProfile(ctx context.Context, userID int64) (*domain.Use
 
 func (s *authUsecase) RefreshToken(ctx context.Context, refreshToken string) (string, error) {
 	userID, err := s.tokenSvc.ParseRefreshToken(refreshToken)
-
 	if err != nil {
 		return "", response.ErrorRefreshTokenInvalid
 	}
