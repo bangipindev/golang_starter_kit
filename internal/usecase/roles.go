@@ -42,7 +42,7 @@ func (s *rolesUsecase) Create(ctx context.Context, roles *domain.Roles) error {
 }
 
 func (s *rolesUsecase) Update(ctx context.Context, role *domain.Roles) error {
-	// cek apakah role ada berdasarkan ID
+
 	existing, err := s.rolesRepo.FindByID(ctx, role.ID)
 	if err != nil {
 		return response.ErrNotFound

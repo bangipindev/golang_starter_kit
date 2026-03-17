@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"gpt/internal/domain"
+	"gpt/internal/pkg/response"
 )
 
 type userRepository struct {
@@ -75,4 +76,40 @@ func (r *userRepository) FindByID(ctx context.Context, id int64) (*domain.User, 
 	}
 
 	return &user, nil
+}
+
+func (r *userRepository) Update(ctx context.Context, user *domain.User) error {
+	query := "UPDATE users SET name=?, email=?, password=?, role=? WHERE id=?"
+	result, err := r.db.ExecContext(ctx, query, user.Name, user.Email, user.Password, user.Role, user.ID)
+	if err != nil {
+		return err
+	}
+
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		return err
+	}
+
+	if rowsAffected == 0 {
+		return response.ErrNotFound
+	}
+	return nil
+}
+
+func (r *userRepository) Delete(ctx context.Context, id int64) error {
+	query := "DELETE FROM users WHERE id=?"
+	result, err := r.db.ExecContext(ctx, query, id)
+	if err != nil {
+		return err
+	}
+
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		return err
+	}
+
+	if rowsAffected == 0 {
+		return response.ErrNotFound
+	}
+	return nil
 }
