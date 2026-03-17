@@ -12,7 +12,10 @@ func RunMigrations(db *sql.DB) {
 		log.Fatal(err)
 	}
 
-	if err := goose.Up(db, "migrations"); err != nil {
+	wd, _ := os.Getwd()
+	migrationPath := wd + "/migrations"
+
+	if err := goose.Up(db, migrationPath); err != nil {
 		log.Fatal("Migration failed:", err)
 	}
 

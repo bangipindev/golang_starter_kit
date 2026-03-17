@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/spf13/viper"
+	"github.com/joho/godotenv"
 )
 
 type Config struct {
