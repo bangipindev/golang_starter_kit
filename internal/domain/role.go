@@ -1,6 +1,9 @@
 package domain
 
-import "context"
+import (
+	"context"
+	"time"
+)
 
 type Role string
 
@@ -14,6 +17,8 @@ type Roles struct {
 	ID        int64
 	Name      string
 	GuardName string
+	CreatedAt time.Time
+	UpdatedAt time.Time
 }
 
 type RoleRepository interface {

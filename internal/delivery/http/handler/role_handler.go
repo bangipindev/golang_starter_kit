@@ -28,7 +28,8 @@ func (h *RolesHandler) GetAll(c *fiber.Ctx) error {
 		return response.HandleError(c, err)
 	}
 
-	return response.SuccessWithStatus(c, fiber.StatusOK, "Successfully", roles)
+	roleResponse := dto.ToRolesResponseList(roles)
+	return response.SuccessWithStatus(c, fiber.StatusOK, "Successfully", roleResponse)
 }
 
 func (h *RolesHandler) Create(c *fiber.Ctx) error {
