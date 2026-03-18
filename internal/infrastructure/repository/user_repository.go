@@ -27,7 +27,7 @@ func (r *userRepository) GetAll(ctx context.Context) ([]*domain.User, error) {
 	for rows.Next() {
 		var user domain.User
 
-		if err := rows.Scan(&user.ID, &user.Name, &user.Email, &user.Role); err != nil {
+		if err := rows.Scan(&user.ID, &user.Name, &user.Email); err != nil {
 			return nil, err
 		}
 
@@ -44,7 +44,7 @@ func (r *userRepository) GetAll(ctx context.Context) ([]*domain.User, error) {
 func (r *userRepository) Create(ctx context.Context, user *domain.User) error {
 	query := "INSERT INTO users(name,email,password,role) VALUES(?,?,?,?)"
 	_, err := r.db.ExecContext(ctx, query,
-		user.Name, user.Email, user.Password, user.Role)
+		user.Name, user.Email, user.Password)
 	return err
 }
 
@@ -55,7 +55,7 @@ func (r *userRepository) FindByEmail(ctx context.Context, email string) (*domain
 	)
 
 	var user domain.User
-	err := row.Scan(&user.ID, &user.Name, &user.Email, &user.Password, &user.Role)
+	err := row.Scan(&user.ID, &user.Name, &user.Email, &user.Password)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return nil, nil
@@ -73,7 +73,7 @@ func (r *userRepository) FindByID(ctx context.Context, id int64) (*domain.User, 
 	)
 
 	var user domain.User
-	err := row.Scan(&user.ID, &user.Name, &user.Email, &user.Password, &user.Role)
+	err := row.Scan(&user.ID, &user.Name, &user.Email, &user.Password)
 	if err != nil {
 		return nil, err
 	}
@@ -83,7 +83,7 @@ func (r *userRepository) FindByID(ctx context.Context, id int64) (*domain.User, 
 
 func (r *userRepository) Update(ctx context.Context, user *domain.User) error {
 	query := "UPDATE users SET name=?, email=?, password=?, role=? WHERE id=?"
-	result, err := r.db.ExecContext(ctx, query, user.Name, user.Email, user.Password, user.Role, user.ID)
+	result, err := r.db.ExecContext(ctx, query, user.Name, user.Email, user.Password, user.ID)
 	if err != nil {
 		return err
 	}

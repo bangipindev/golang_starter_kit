@@ -26,7 +26,7 @@ func (j *JWTService) GenerateAccessToken(user *domain.User) (string, error) {
 	claims := token.JWTAccessClaims{
 		UserID: user.ID,
 		Name:   user.Name,
-		Role:   user.Role,
+		// Role:   user.Role,
 		RegisteredClaims: jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(time.Now().Add(j.accessExpiry)),
 			IssuedAt:  jwt.NewNumericDate(time.Now()),

@@ -18,10 +18,10 @@ type UserRequest struct {
 }
 
 type AuthUserResponse struct {
-	ID    int64       `json:"id"`
-	Name  string      `json:"name"`
-	Email string      `json:"email"`
-	Role  domain.Role `json:"role"`
+	ID    int64  `json:"id"`
+	Name  string `json:"name"`
+	Email string `json:"email"`
+	// Role  domain.Role `json:"role"`
 }
 
 func ToAuthUserResponse(user *domain.User) *AuthUserResponse {
@@ -29,7 +29,7 @@ func ToAuthUserResponse(user *domain.User) *AuthUserResponse {
 		ID:    user.ID,
 		Name:  user.Name,
 		Email: user.Email,
-		Role:  user.Role,
+		// Role:  user.Role,
 	}
 }
 
@@ -52,7 +52,7 @@ func ToUpdateUserResponse(user *domain.User) *UpdateUserResponse {
 		ID:    user.ID,
 		Name:  user.Name,
 		Email: user.Email,
-		Role:  user.Role,
+		// Role:  user.Role,
 	}
 }
 
@@ -68,7 +68,7 @@ func ToUserResponse(user *domain.User) UserResponse {
 		ID:    user.ID,
 		Name:  user.Name,
 		Email: user.Email,
-		Role:  user.Role,
+		// Role:  user.Role,
 	}
 }
 
@@ -96,6 +96,6 @@ func (r *UserRequest) ToDomain() (*domain.User, error) {
 		Name:     r.Name,
 		Email:    r.Email,
 		Password: r.Password, // nanti di-hash di usecase
-		Role:     role,
+		// Role:     role,
 	}, nil
 }

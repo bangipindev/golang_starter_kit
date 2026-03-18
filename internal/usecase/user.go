@@ -72,9 +72,9 @@ func (u *userUsecase) Update(ctx context.Context, req *domain.User) error {
 
 	existing.Name = req.Name
 	existing.Email = req.Email
-	if req.Role != "" {
-		existing.Role = req.Role
-	}
+	// if req.Role != "" {
+	// 	existing.Role = req.Role
+	// }
 
 	if req.Password != "" {
 		hashedPassword, err := bcrypt.GenerateFromPassword([]byte(req.Password), bcrypt.DefaultCost)

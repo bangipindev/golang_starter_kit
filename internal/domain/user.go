@@ -1,13 +1,18 @@
 package domain
 
-import "context"
+import (
+	"context"
+
+	"github.com/google/uuid"
+)
 
 type User struct {
 	ID       int64
 	Name     string
 	Email    string
 	Password string
-	Role     Role
+	PublicId uuid.UUID
+	Status   int
 }
 
 type UserRepository interface {

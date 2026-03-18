@@ -78,7 +78,7 @@ func (h *UserHandler) Update(c *fiber.Ctx) error {
 		ID:    id,
 		Name:  req.Name,
 		Email: req.Email,
-		Role:  domain.Role(req.Role),
+		// Role:  domain.Role(req.Role),
 	}
 
 	if req.Password != nil {

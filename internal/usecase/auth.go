@@ -50,7 +50,7 @@ func (s *authUsecase) Register(ctx context.Context, user *domain.User) error {
 	}
 
 	user.Password = string(hashed)
-	user.Role = domain.RoleUser
+	// user.Role = domain.RoleUser
 
 	return s.userRepo.Create(ctx, user)
 }

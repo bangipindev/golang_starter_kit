@@ -3,6 +3,7 @@ CREATE TABLE users (
     `name` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
     `email` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
     `password` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+    `public_id` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
     `status` tinyint DEFAULT 1,
     `created_at` timestamp NULL DEFAULT NULL,
     `updated_at` timestamp NULL DEFAULT NULL,
