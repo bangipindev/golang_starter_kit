@@ -16,7 +16,7 @@ func NewUserRepository(db *sql.DB) domain.UserRepository {
 }
 
 func (r *userRepository) GetAll(ctx context.Context) ([]*domain.User, error) {
-	rows, err := r.db.QueryContext(ctx, "SELECT id, name, email, role FROM users")
+	rows, err := r.db.QueryContext(ctx, "SELECT id, name, email FROM users")
 	if err != nil {
 		return nil, err
 	}
@@ -42,7 +42,7 @@ func (r *userRepository) GetAll(ctx context.Context) ([]*domain.User, error) {
 }
 
 func (r *userRepository) Create(ctx context.Context, user *domain.User) error {
-	query := "INSERT INTO users(name,email,password,role) VALUES(?,?,?,?)"
+	query := "INSERT INTO users(name,email,password) VALUES(?,?,?)"
 	_, err := r.db.ExecContext(ctx, query,
 		user.Name, user.Email, user.Password)
 	return err
@@ -50,7 +50,7 @@ func (r *userRepository) Create(ctx context.Context, user *domain.User) error {
 
 func (r *userRepository) FindByEmail(ctx context.Context, email string) (*domain.User, error) {
 	row := r.db.QueryRowContext(ctx,
-		"SELECT id,name,email,password, role FROM users WHERE email=?",
+		"SELECT id,name,email,password FROM users WHERE email=?",
 		email,
 	)
 
@@ -68,7 +68,7 @@ func (r *userRepository) FindByEmail(ctx context.Context, email string) (*domain
 
 func (r *userRepository) FindByID(ctx context.Context, id int64) (*domain.User, error) {
 	row := r.db.QueryRowContext(ctx,
-		"SELECT id,name,email,password, role FROM users WHERE id=?",
+		"SELECT id,name,email,password FROM users WHERE id=?",
 		id,
 	)
 
@@ -82,7 +82,7 @@ func (r *userRepository) FindByID(ctx context.Context, id int64) (*domain.User, 
 }
 
 func (r *userRepository) Update(ctx context.Context, user *domain.User) error {
-	query := "UPDATE users SET name=?, email=?, password=?, role=? WHERE id=?"
+	query := "UPDATE users SET name=?, email=?, password=? WHERE id=?"
 	result, err := r.db.ExecContext(ctx, query, user.Name, user.Email, user.Password, user.ID)
 	if err != nil {
 		return err
