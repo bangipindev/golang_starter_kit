@@ -1,4 +1,4 @@
-DB_URL=mysql://root:root@tcp(localhost:3306)/golang?multiStatements=true
+DB_URL=mysql://wsluser:wslpassword@tcp(gpt_mysql:3306)/golang?multiStatements=true
 MIGRATE=migrate -path migrations -database "$(DB_URL)"
 
 migrate-version:
@@ -10,8 +10,8 @@ migrate-up:
 migrate-down:
 	$(MIGRATE) down 1
 
-migrate-reset:
-	$(MIGRATE) drop -f && $(MIGRATE) up
+# migrate-reset:
+# 	$(MIGRATE) drop -f && $(MIGRATE) up
 
-migrate-force:
-	$(MIGRATE) force 1
+# migrate-force:
+# 	$(MIGRATE) force 1

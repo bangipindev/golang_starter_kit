@@ -7,6 +7,8 @@ import (
 	"gpt/internal/infrastructure"
 	"log"
 	"strings"
+	"fmt"
+	"os"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/logger"
@@ -30,7 +32,11 @@ func main() {
 	log.Printf("Server running in %s mode", strings.ToUpper(mode))
 
 	if cfg.RunMigration {
-		infrastructure.RunMigrations(dbUrl, "file://migrations")
+		migrationPath := os.Getenv("MIGRATION_PATH")
+		if migrationPath == "" {
+			migrationPath = "file://migrations"
+		}
+		infrastructure.RunMigrations(dbUrl, migrationPath)
 		infrastructure.RunSeed(db)
 		log.Println("Migration & Seed executed")
 	}
