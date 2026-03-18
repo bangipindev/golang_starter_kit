@@ -6,6 +6,7 @@ import (
 	"gpt/internal/delivery/http"
 	"gpt/internal/infrastructure"
 	"log"
+	"os"
 	"strings"
 
 	"github.com/gofiber/fiber/v2"
@@ -21,6 +22,8 @@ func main() {
 		log.Fatal(err)
 	}
 
+	infrastructure.WaitForDB(db)
+
 	dbUrl := infrastructure.BuildDBURL(cfg)
 
 	mode := cfg.AppMode
@@ -28,20 +31,14 @@ func main() {
 	log.Printf("Server running in %s mode", strings.ToUpper(mode))
 
 	if cfg.RunMigration {
-		infrastructure.WaitForDB(db)
-		infrastructure.RunMigrations(dbUrl, "up")
+		migrationPath := os.Getenv("MIGRATION_PATH")
+		if migrationPath == "" {
+			migrationPath = "file://migrations"
+		}
+		infrastructure.RunMigrations(dbUrl, migrationPath)
 		infrastructure.RunSeed(db)
-		log.Println("Migration executed")
+		log.Println("Migration & Seed executed")
 	}
-	// if cfg.AppMode == "dev" {
-	// 	infrastructure.RunMigrations(db)
-	// 	log.Println("Congrats...! Server Running in DEV mode")
-	// } else if cfg.AppMode == "staging" {
-	// 	infrastructure.RunMigrations(db)
-	// 	log.Println("Congrats...! Server Running in STAGING mode")
-	// } else {
-	// 	log.Println("Congrats...! Server Running in PRODUCTION mode")
-	// }
 
 	container := container.NewContainer(db, cfg)
 
@@ -55,5 +52,6 @@ func main() {
 	// ======================
 	// Start Server
 	// ======================
+	log.Println("Server started on port", cfg.AppPort)
 	log.Fatal(app.Listen(":" + cfg.AppPort))
 }

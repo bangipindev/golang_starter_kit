@@ -6,13 +6,14 @@ import (
 	"gpt/internal/domain"
 	"gpt/internal/pkg/response"
 
+	"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"
 )
 
 type AuthUsecase interface {
 	Register(ctx context.Context, user *domain.User) error
 	Login(ctx context.Context, email, password string) (*LoginResponse, error)
-	GetProfile(ctx context.Context, id int64) (*domain.User, error)
+	GetProfile(ctx context.Context, public_id uuid.UUID) (*domain.User, error)
 	RefreshToken(ctx context.Context, refreshToken string) (string, error)
 }
 
@@ -50,7 +51,7 @@ func (s *authUsecase) Register(ctx context.Context, user *domain.User) error {
 	}
 
 	user.Password = string(hashed)
-	user.Role = domain.RoleUser
+	// user.Role = domain.RoleUser
 
 	return s.userRepo.Create(ctx, user)
 }
@@ -59,6 +60,10 @@ func (s *authUsecase) Login(ctx context.Context, email, password string) (*Login
 	user, err := s.userRepo.FindByEmail(ctx, email)
 	if err != nil {
 		return nil, response.ErrNotFound
+	}
+
+	if user.Status == domain.NonAktif {
+		return nil, response.ErrUserInactive
 	}
 
 	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password)); err != nil {
@@ -84,8 +89,8 @@ func (s *authUsecase) Login(ctx context.Context, email, password string) (*Login
 	}, nil
 }
 
-func (s *authUsecase) GetProfile(ctx context.Context, userID int64) (*domain.User, error) {
-	user, err := s.userRepo.FindByID(ctx, userID)
+func (s *authUsecase) GetProfile(ctx context.Context, PublicId uuid.UUID) (*domain.User, error) {
+	user, err := s.userRepo.FindByPublicID(ctx, PublicId)
 	if err != nil {
 		return nil, response.ErrNotFound
 	}
@@ -95,12 +100,12 @@ func (s *authUsecase) GetProfile(ctx context.Context, userID int64) (*domain.Use
 }
 
 func (s *authUsecase) RefreshToken(ctx context.Context, refreshToken string) (string, error) {
-	userID, err := s.tokenSvc.ParseRefreshToken(refreshToken)
+	publicId, err := s.tokenSvc.ParseRefreshToken(refreshToken)
 	if err != nil {
 		return "", response.ErrorRefreshTokenInvalid
 	}
 
-	user, err := s.userRepo.FindByID(ctx, userID)
+	user, err := s.userRepo.FindByPublicID(ctx, publicId)
 	if err != nil {
 		return "", response.ErrNotFound
 	}

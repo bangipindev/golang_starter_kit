@@ -1,9 +1,15 @@
 CREATE TABLE users (
-    id BIGINT AUTO_INCREMENT PRIMARY KEY,
-    name VARCHAR(100),
-    email VARCHAR(100) UNIQUE,
-    password TEXT,
-    role VARCHAR(100),
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
+    `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+    `name` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
+    `email` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
+    `password` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+    `public_id` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+    `status` tinyint DEFAULT NULL,
+    `created_at` timestamp NULL DEFAULT NULL,
+    `updated_at` timestamp NULL DEFAULT NULL,
+    `deleted_at` timestamp NULL DEFAULT NULL,
+    PRIMARY KEY (`id`),
+    UNIQUE KEY `users_email_unique` (`email`),
+    KEY `users_status_index` (`status`),
+    KEY `users_deleted_at_index` (`deleted_at`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

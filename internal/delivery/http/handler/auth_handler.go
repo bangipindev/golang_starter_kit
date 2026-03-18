@@ -8,6 +8,7 @@ import (
 
 	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v2"
+	"github.com/google/uuid"
 )
 
 type AuthHandler struct {
@@ -29,9 +30,7 @@ func (h *AuthHandler) Register(c *fiber.Ctx) error {
 		return response.HandleError(c, response.ErrorBadRequest)
 	}
 
-	// Validasi struct
 	if err := validate.Struct(req); err != nil {
-		// Bisa return error validasi dengan pesan detail
 		return response.ValidationError(c, err)
 	}
 
@@ -39,13 +38,15 @@ func (h *AuthHandler) Register(c *fiber.Ctx) error {
 		Name:     req.Name,
 		Email:    req.Email,
 		Password: req.Password,
+		PublicId: uuid.New(),
+		Status:   domain.Aktif,
 	}
 
 	if err := h.authUsecase.Register(c.Context(), user); err != nil {
 		return response.HandleError(c, err)
 	}
 
-	return response.SuccessWithStatus(c, fiber.StatusCreated, "User registered successfully", user)
+	return response.SuccessWithStatus(c, fiber.StatusCreated, "User registered successfully", dto.ToAuthUserResponse(user))
 }
 
 func (h *AuthHandler) Login(c *fiber.Ctx) error {
@@ -65,9 +66,9 @@ func (h *AuthHandler) Login(c *fiber.Ctx) error {
 	}
 
 	user := dto.AuthUserResponse{
-		ID:    res.User.ID,
-		Name:  res.User.Name,
-		Email: res.User.Email,
+		Name:     res.User.Name,
+		Email:    res.User.Email,
+		PublicId: res.User.PublicId,
 	}
 
 	loginResponse := dto.LoginResponse{
@@ -82,7 +83,7 @@ func (h *AuthHandler) Login(c *fiber.Ctx) error {
 func (h *AuthHandler) Profile(c *fiber.Ctx) error {
 	claims := c.Locals("user").(*domain.AccessClaims)
 
-	user, err := h.authUsecase.GetProfile(c.Context(), claims.UserID)
+	user, err := h.authUsecase.GetProfile(c.Context(), claims.PublicId)
 	if err != nil {
 		return response.HandleError(c, response.ErrNotFound)
 	}

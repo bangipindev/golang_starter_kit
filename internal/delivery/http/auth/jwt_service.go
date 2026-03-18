@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
+	"github.com/google/uuid"
 )
 
 type JWTService struct {
@@ -24,9 +25,9 @@ func NewJWTService(secret string, accessExpiry, refreshExpiry time.Duration) *JW
 
 func (j *JWTService) GenerateAccessToken(user *domain.User) (string, error) {
 	claims := token.JWTAccessClaims{
-		UserID: user.ID,
-		Name:   user.Name,
-		Role:   user.Role,
+		PublicId: user.PublicId,
+		Name:     user.Name,
+		// Role:   user.Role,
 		RegisteredClaims: jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(time.Now().Add(j.accessExpiry)),
 			IssuedAt:  jwt.NewNumericDate(time.Now()),
@@ -39,8 +40,8 @@ func (j *JWTService) GenerateAccessToken(user *domain.User) (string, error) {
 
 func (j *JWTService) GenerateRefreshToken(user *domain.User) (string, error) {
 	claims := token.JWTRefreshClaims{
-		UserID: user.ID,
-		Type:   "refresh",
+		PublicId: user.PublicId,
+		Type:     "refresh",
 		RegisteredClaims: jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(time.Now().Add(j.refreshExpiry)),
 			IssuedAt:  jwt.NewNumericDate(time.Now()),
@@ -51,7 +52,7 @@ func (j *JWTService) GenerateRefreshToken(user *domain.User) (string, error) {
 	return token.SignedString([]byte(j.secret))
 }
 
-func (j *JWTService) ParseRefreshToken(tokenString string) (int64, error) {
+func (j *JWTService) ParseRefreshToken(tokenString string) (uuid.UUID, error) {
 	parsedToken, err := jwt.ParseWithClaims(
 		tokenString,
 		&token.JWTRefreshClaims{},
@@ -60,19 +61,19 @@ func (j *JWTService) ParseRefreshToken(tokenString string) (int64, error) {
 		},
 	)
 	if err != nil || !parsedToken.Valid {
-		return 0, err
+		return uuid.Nil, err
 	}
 
 	claims, ok := parsedToken.Claims.(*token.JWTRefreshClaims)
 	if !ok {
-		return 0, jwt.ErrTokenInvalidClaims
+		return uuid.Nil, jwt.ErrTokenInvalidClaims
 	}
 
 	if claims.Type != "refresh" {
-		return 0, jwt.ErrTokenInvalidClaims
+		return uuid.Nil, jwt.ErrTokenInvalidClaims
 	}
 
-	return claims.UserID, nil
+	return claims.PublicId, nil
 }
 
 func (j *JWTService) ParseAccessToken(tokenString string) (*domain.AccessClaims, error) {
@@ -92,8 +93,7 @@ func (j *JWTService) ParseAccessToken(tokenString string) (*domain.AccessClaims,
 
 	// convert ke domain claims
 	return &domain.AccessClaims{
-		UserID: jwtClaims.UserID,
-		Name:   jwtClaims.Name,
-		Role:   jwtClaims.Role,
+		PublicId: jwtClaims.PublicId,
+		Name:     jwtClaims.Name,
 	}, nil
 }

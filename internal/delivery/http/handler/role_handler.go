@@ -38,9 +38,7 @@ func (h *RolesHandler) Create(c *fiber.Ctx) error {
 		return response.HandleError(c, response.ErrorBadRequest)
 	}
 
-	// Validasi struct
 	if err := validate.Struct(req); err != nil {
-		// Bisa return error validasi dengan pesan detail
 		return response.ValidationError(c, err)
 	}
 
@@ -53,7 +51,8 @@ func (h *RolesHandler) Create(c *fiber.Ctx) error {
 		return response.HandleError(c, err)
 	}
 
-	return response.SuccessWithStatus(c, fiber.StatusCreated, "Role registered successfully", roles)
+	roleRes := dto.ToRolesResponse(roles)
+	return response.SuccessWithStatus(c, fiber.StatusCreated, "Role registered successfully", roleRes)
 }
 
 func (h *RolesHandler) Update(c *fiber.Ctx) error {

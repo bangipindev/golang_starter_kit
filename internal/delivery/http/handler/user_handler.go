@@ -78,18 +78,18 @@ func (h *UserHandler) Update(c *fiber.Ctx) error {
 		ID:    id,
 		Name:  req.Name,
 		Email: req.Email,
-		Role:  domain.Role(req.Role),
 	}
 
 	if req.Password != nil {
 		user.Password = *req.Password
 	}
 
-	if err := h.userUsecase.Update(c.Context(), user); err != nil {
+	updatedUser, err := h.userUsecase.Update(c.Context(), user)
+	if err != nil {
 		return response.HandleError(c, err)
 	}
 
-	return response.SuccessWithStatus(c, fiber.StatusOK, "User updated successfully", dto.ToUpdateUserResponse(user))
+	return response.SuccessWithStatus(c, fiber.StatusOK, "User updated successfully", dto.ToUpdateUserResponse(updatedUser))
 }
 
 func (h *UserHandler) Delete(c *fiber.Ctx) error {

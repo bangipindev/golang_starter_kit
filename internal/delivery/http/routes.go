@@ -18,7 +18,7 @@ func SetupRoutes(app *fiber.App, cfg *config.Config, container *base.Container) 
 	auth.Post("/refresh", container.AuthHandler.Refresh)
 
 	// Protected Routes V1
-	protected := api.Group("", middleware.AuthMiddleware(container.TokenService))
+	protected := api.Group("", middleware.AuthMiddleware(container.TokenService, container.UserRepo))
 
 	// =====================
 	// User Routes
