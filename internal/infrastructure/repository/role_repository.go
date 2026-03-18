@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"errors"
 	"gpt/internal/domain"
+	"time"
 )
 
 type roleRepository struct {
@@ -46,7 +47,7 @@ func (r *roleRepository) FindByID(ctx context.Context, id int64) (*domain.Roles,
 }
 
 func (r *roleRepository) GetAll(ctx context.Context) ([]*domain.Roles, error) {
-	rows, err := r.db.QueryContext(ctx, "SELECT id, name, guard_name FROM roles")
+	rows, err := r.db.QueryContext(ctx, "SELECT id, name, guard_name,created_at,updated_at FROM roles order by id asc")
 	if err != nil {
 		return nil, err
 	}
@@ -57,7 +58,7 @@ func (r *roleRepository) GetAll(ctx context.Context) ([]*domain.Roles, error) {
 	for rows.Next() {
 		var role domain.Roles
 
-		if err := rows.Scan(&role.ID, &role.Name, &role.GuardName); err != nil {
+		if err := rows.Scan(&role.ID, &role.Name, &role.GuardName, &role.CreatedAt, &role.UpdatedAt); err != nil {
 			return nil, err
 		}
 
@@ -72,9 +73,9 @@ func (r *roleRepository) GetAll(ctx context.Context) ([]*domain.Roles, error) {
 }
 
 func (r *roleRepository) Create(ctx context.Context, roles *domain.Roles) error {
-	query := "INSERT INTO roles(name,guard_name) VALUES(?,?)"
+	query := "INSERT INTO roles(name,guard_name,created_at,updated_at) VALUES(?,?,?,?)"
 	_, err := r.db.ExecContext(ctx, query,
-		roles.Name, roles.GuardName)
+		roles.Name, roles.GuardName, time.Now(), time.Now())
 	return err
 }
 
