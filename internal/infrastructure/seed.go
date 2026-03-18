@@ -3,7 +3,9 @@ package infrastructure
 import (
 	"database/sql"
 	"log"
+	"time"
 
+	"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -17,7 +19,7 @@ func RunSeed(db *sql.DB) {
 	err := db.QueryRow("SELECT id FROM roles WHERE name = ?", "superadmin").Scan(&role)
 
 	if err == sql.ErrNoRows {
-		_, err := db.Exec("INSERT INTO roles (name,guard_name) VALUES (?,?)", "superadmin", "web")
+		_, err := db.Exec("INSERT INTO roles (name,guard_name,created_at,updated_at) VALUES (?,?,?,?)", "superadmin", "web", time.Now(), time.Now())
 		if err != nil {
 			log.Println("Seed role failed:", err)
 			return
@@ -53,9 +55,9 @@ func RunSeed(db *sql.DB) {
 	}
 
 	_, err = db.Exec(`
-		INSERT INTO users (name, email, password, role)
-		VALUES (?, ?, ?, ?)
-	`, "Superadmin", "admin@gmail.com", string(hashed), "superadmin")
+		INSERT INTO users (name, email, password, public_id, status, created_at, updated_at)
+		VALUES (?, ?, ?, ?, ?, ?, ?)
+	`, "Superadmin", "admin@gmail.com", string(hashed), uuid.New().String(), 1, time.Now(), time.Now())
 
 	if err != nil {
 		log.Println("Seed user failed:", err)
