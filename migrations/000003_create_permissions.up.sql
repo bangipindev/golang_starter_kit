@@ -1,9 +1,12 @@
-CREATE TABLE permissions (
-    -- id BIGINT AUTO_INCREMENT PRIMARY KEY,
-    -- name VARCHAR(100),
-    -- email VARCHAR(100) UNIQUE,
-    -- password TEXT,
-    -- role VARCHAR(100),
-    -- created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    -- updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
+CREATE TABLE `permissions` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `guard_name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `permissions_name_guard_name_unique` (`name`,`guard_name`),
+  KEY `permissions_name_index` (`name`),
+  KEY `permissions_deleted_at_index` (`deleted_at`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
