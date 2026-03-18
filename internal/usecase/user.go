@@ -11,7 +11,7 @@ import (
 type UserUsecase interface {
 	GetAll(ctx context.Context) ([]*domain.User, error)
 	Create(ctx context.Context, user *domain.User) error
-	Update(ctx context.Context, user *domain.User) error
+	Update(ctx context.Context, user *domain.User) (*domain.User, error)
 	Delete(ctx context.Context, id int64) error
 }
 
@@ -55,36 +55,40 @@ func (u *userUsecase) Create(ctx context.Context, user *domain.User) error {
 	return u.userRepo.Create(ctx, user)
 }
 
-func (u *userUsecase) Update(ctx context.Context, req *domain.User) error {
+func (u *userUsecase) Update(ctx context.Context, req *domain.User) (*domain.User, error) {
 	existing, err := u.userRepo.FindByID(ctx, req.ID)
-	if err != nil || existing == nil {
-		return response.ErrNotFound
+
+	if err != nil {
+		return nil, err
+	}
+	if existing == nil {
+		return nil, response.ErrNotFound
+	}
+	checkEmail, err := u.userRepo.FindByEmail(ctx, req.Email)
+	if err != nil {
+		return nil, err
 	}
 
-	checkEmail, err := u.userRepo.FindByEmail(ctx, req.Email)
-
-	if err != nil || checkEmail != nil {
-		if checkEmail.ID == req.ID {
-			return nil
-		}
-		return response.ErrEmailAlreadyUsed
+	if checkEmail != nil && checkEmail.ID != req.ID {
+		return nil, response.ErrEmailAlreadyUsed
 	}
 
 	existing.Name = req.Name
 	existing.Email = req.Email
-	// if req.Role != "" {
-	// 	existing.Role = req.Role
-	// }
 
 	if req.Password != "" {
 		hashedPassword, err := bcrypt.GenerateFromPassword([]byte(req.Password), bcrypt.DefaultCost)
 		if err != nil {
-			return err
+			return nil, err
 		}
 		existing.Password = string(hashedPassword)
 	}
 
-	return u.userRepo.Update(ctx, existing)
+	err = u.userRepo.Update(ctx, existing)
+	if err != nil {
+		return nil, err
+	}
+	return existing, nil
 }
 
 func (u *userUsecase) Delete(ctx context.Context, id int64) error {

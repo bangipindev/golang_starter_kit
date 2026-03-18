@@ -15,6 +15,7 @@ type Container struct {
 	TokenService domain.TokenService
 	RoleHandler  *handler.RolesHandler
 	UserHandler  *handler.UserHandler
+	UserRepo     domain.UserRepository
 }
 
 func NewContainer(db *sql.DB, cfg *config.Config) *Container {
@@ -29,6 +30,7 @@ func NewContainer(db *sql.DB, cfg *config.Config) *Container {
 
 	return &Container{
 		TokenService: jwtService,
+		UserRepo:     userRepo,
 		AuthHandler:  handler.NewAuthHandler(authUsecase),
 		RoleHandler:  handler.NewRolesHandler(roleUsecase),
 		UserHandler:  handler.NewUserHandler(userUsecase),

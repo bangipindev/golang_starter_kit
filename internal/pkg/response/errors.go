@@ -39,6 +39,12 @@ var (
 	ErrNotFound        = errors.New("not found")
 	ErrUnauthorized    = errors.New("unauthorized")
 	ErrForbiddenAccess = errors.New("forbidden access")
+	ErrUserInactive    = errors.New("user is inactive")
+	ErrTokenExpired    = errors.New("token expired or invalid")
+	ErrTokenInvalid    = errors.New("token invalid")
+	ErrTokenNotProvide = errors.New("token not provide")
+	ErrAuthorization   = errors.New("authorization is required")
+	ErrAuthNotValid    = errors.New("authorization is not valid , required bearer token")
 
 	// auth
 	ErrEmailRequired         = errors.New("email is required")
@@ -81,6 +87,12 @@ var (
 	ErrorEmailInvalid          = NewError(ErrEmailInvalid.Error(), "400", http.StatusBadRequest)
 	ErrorPasswordRequired      = NewError(ErrPasswordRequired.Error(), "400", http.StatusBadRequest)
 	ErrorPasswordInvalidLength = NewError(ErrPasswordInvalidLength.Error(), "400", http.StatusBadRequest)
+	ErrorUserInactive          = NewError(ErrUserInactive.Error(), "403", http.StatusForbidden)
+	ErrorTokenExpired          = NewError(ErrTokenExpired.Error(), "401", http.StatusUnauthorized)
+	ErrorTokenInvalid          = NewError(ErrTokenInvalid.Error(), "401", http.StatusUnauthorized)
+	ErrorTokenNotProvide       = NewError(ErrTokenNotProvide.Error(), "401", http.StatusUnauthorized)
+	ErrorAuthorization         = NewError(ErrAuthorization.Error(), "401", http.StatusUnauthorized)
+	ErrorAuthNotValid          = NewError(ErrAuthNotValid.Error(), "401", http.StatusUnauthorized)
 )
 
 //
@@ -98,6 +110,12 @@ var ErrorMapping = map[string]Error{
 	ErrAuthIsNotExists.Error():       ErrorAuthIsNotExists,
 	ErrEmailAlreadyUsed.Error():      ErrorEmailAlreadyUsed,
 	ErrPasswordNotMatch.Error():      ErrorPasswordNotMatch,
+	ErrUserInactive.Error():          ErrorUserInactive,
+	ErrTokenExpired.Error():          ErrorTokenExpired,
+	ErrTokenInvalid.Error():          ErrorTokenInvalid,
+	ErrTokenNotProvide.Error():       ErrorTokenNotProvide,
+	ErrAuthorization.Error():         ErrorAuthorization,
+	ErrAuthNotValid.Error():          ErrorAuthNotValid,
 
 	ErrRefreshTokenInvalid.Error(): ErrorRefreshTokenInvalid,
 }

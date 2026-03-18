@@ -6,9 +6,8 @@ import (
 	"gpt/internal/delivery/http"
 	"gpt/internal/infrastructure"
 	"log"
-	"strings"
-	"fmt"
 	"os"
+	"strings"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/logger"

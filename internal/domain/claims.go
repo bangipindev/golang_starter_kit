@@ -1,9 +1,10 @@
 package domain
 
+import "github.com/google/uuid"
+
 type AccessClaims struct {
-	UserID int64  `json:"user_id"`
-	Name   string `json:"name"`
-	Role   Role   `json:"role"`
+	PublicId uuid.UUID `json:"public_id"`
+	Name     string    `json:"name"`
 }
 
 type RefreshClaims struct {
