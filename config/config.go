@@ -4,20 +4,20 @@ import (
 	"log"
 	"time"
 
-	"github.com/spf13/viper"
 	"github.com/joho/godotenv"
+	"github.com/spf13/viper"
 )
 
 type Config struct {
 	AppMode string
 	AppPort string
 
-	RunMigration bool
-	DBHost       string
-	DBPort       string
-	DBUser       string
-	DBPass       string
-	DBName       string
+	RunMigration     bool
+	DBHost           string
+	DBPort           string
+	DBUser           string
+	DBPass           string
+	DBName           string
 	JWTSecret        string
 	JWTAccessExpiry  time.Duration
 	JWTRefreshExpiry time.Duration
@@ -33,8 +33,6 @@ type DBConnectionPoolConfig struct {
 }
 
 func LoadConfig() *Config {
-	// viper.SetConfigFile(".env")
-	// viper.ReadInConfig()
 	_ = godotenv.Load()
 	viper.AutomaticEnv()
 	accessExp, _ := time.ParseDuration(viper.GetString("JWT_ACCESS_EXPIRY"))
@@ -52,7 +50,7 @@ func LoadConfig() *Config {
 		AppMode: viper.GetString("APP_MODE"),
 		AppPort: viper.GetString("APP_PORT"),
 
-		RunMigration: 	viper.GetBool("RUN_MIGRATION"),
+		RunMigration:     viper.GetBool("RUN_MIGRATION"),
 		DBHost:           viper.GetString("DB_HOST"),
 		DBPort:           viper.GetString("DB_PORT"),
 		DBUser:           viper.GetString("DB_USER"),
