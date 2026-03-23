@@ -45,6 +45,7 @@ func (r *userRepository) GetAll(ctx context.Context) ([]*domain.User, error) {
 }
 
 func (r *userRepository) Create(ctx context.Context, user *domain.User) error {
+	// user.ID = uuid.New().String()
 	query := "INSERT INTO users(name,email,password,public_id,status,created_at,updated_at) VALUES(?,?,?,?,?,?,?)"
 	_, err := r.db.ExecContext(ctx, query, user.Name, user.Email, user.Password, user.PublicId, user.Status, time.Now(), time.Now())
 	return err

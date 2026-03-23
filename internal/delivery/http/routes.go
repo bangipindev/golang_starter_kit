@@ -43,4 +43,13 @@ func SetupRoutes(app *fiber.App, cfg *config.Config, container *base.Container) 
 	roleGroup.Post("/add", container.RoleHandler.Create)
 	roleGroup.Put("/:id", container.RoleHandler.Update)
 	roleGroup.Delete("/:id", container.RoleHandler.Delete)
+
+	// =====================
+	// Role Routes
+	// =====================
+	permissionGroup := protected.Group("/permission")
+	permissionGroup.Get("/", container.PermissionHandler.GetAll)
+	permissionGroup.Post("/add", container.PermissionHandler.Create)
+	permissionGroup.Put("/:id", container.PermissionHandler.Update)
+	permissionGroup.Delete("/:id", container.PermissionHandler.Delete)
 }
