@@ -48,18 +48,3 @@ func GetClaims(c *fiber.Ctx) (*domain.AccessClaims, error) {
 	}
 	return claims, nil
 }
-
-// func RequireRole(role domain.Role) fiber.Handler {
-// 	return func(c *fiber.Ctx) error {
-// 		claims, ok := c.Locals("user").(*domain.AccessClaims)
-// 		if !ok {
-// 			return fiber.ErrUnauthorized
-// 		}
-
-// 		if claims.Role != role {
-// 			return fiber.ErrForbidden
-// 		}
-
-// 		return c.Next()
-// 	}
-// }
