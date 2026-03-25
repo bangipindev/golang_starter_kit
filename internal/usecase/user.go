@@ -103,3 +103,7 @@ func (u *userUsecase) AssignPermissionToUser(ctx context.Context, userID int64, 
 func (u *userUsecase) GetRolesAndPermissions(ctx context.Context, userID int64) ([]string, []string, error) {
 	return u.userRepo.GetRolesAndPermissions(ctx, userID)
 }
+
+func (u *userUsecase) FindByID(ctx context.Context, userID int64) (*domain.User, error) {
+	return u.userRepo.FindByID(ctx, userID)
+}

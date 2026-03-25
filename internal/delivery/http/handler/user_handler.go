@@ -155,14 +155,22 @@ func (h *UserHandler) GetRolesAndPermissions(c *fiber.Ctx) error {
 		return response.HandleError(c, response.ErrorBadRequest)
 	}
 
+	user, err := h.userUsecase.FindByID(c.Context(), userID)
+	if err != nil {
+		return response.HandleError(c, response.ErrorBadRequest)
+	}
+
 	roles, permissions, err := h.userUsecase.GetRolesAndPermissions(c.Context(), userID)
 	if err != nil {
 		return response.HandleError(c, err)
 	}
 
 	res := dto.UserRolesPermissionsResponse{
-		Roles:       roles,
-		Permissions: permissions,
+		User: dto.UserWithRolesPermissions{
+			UserResponse: dto.ToUserResponse(user),
+			Roles:        roles,
+			Permissions:  permissions,
+		},
 	}
 
 	return response.SuccessWithStatus(c, fiber.StatusOK, "Successfully fetched roles and permissions", res)

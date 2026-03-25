@@ -46,4 +46,5 @@ type UserUsecase interface {
 	AssignRoleToUser(ctx context.Context, userID int64, roleID int64) error
 	AssignPermissionToUser(ctx context.Context, userID int64, permissionID int64) error
 	GetRolesAndPermissions(ctx context.Context, userID int64) ([]string, []string, error)
+	FindByID(ctx context.Context, id int64) (*User, error)
 }

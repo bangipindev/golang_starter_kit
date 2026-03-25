@@ -119,7 +119,12 @@ func (r *UserRequest) ToDomain() (*domain.User, error) {
 	}, nil
 }
 
-type UserRolesPermissionsResponse struct {
+type UserWithRolesPermissions struct {
+	UserResponse
 	Roles       []string `json:"roles"`
 	Permissions []string `json:"permissions"`
+}
+
+type UserRolesPermissionsResponse struct {
+	User UserWithRolesPermissions `json:"user"`
 }
