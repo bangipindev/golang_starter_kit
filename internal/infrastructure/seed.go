@@ -10,21 +10,21 @@ import (
 )
 
 func RunSeed(db *sql.DB) {
-	var role string
+	var roleID int64
 	var count int
 
 	// ===============================
 	// 1. Seed Role
 	// ===============================
-	err := db.QueryRow("SELECT id FROM roles WHERE name = ?", "superadmin").Scan(&role)
+	err := db.QueryRow("SELECT id FROM roles WHERE name = ?", "superadmin").Scan(&roleID)
 
 	if err == sql.ErrNoRows {
-		_, err := db.Exec("INSERT INTO roles (name,guard_name,created_at,updated_at) VALUES (?,?,?,?)", "superadmin", "web", time.Now(), time.Now())
+		res, err := db.Exec("INSERT INTO roles (name,guard_name,created_at,updated_at) VALUES (?,?,?,?)", "superadmin", "web", time.Now(), time.Now())
 		if err != nil {
 			log.Println("Seed role failed:", err)
 			return
 		}
-
+		roleID, _ = res.LastInsertId()
 		log.Println("Role superadmin created")
 	} else if err != nil {
 		log.Println("Role check failed:", err)
@@ -54,7 +54,7 @@ func RunSeed(db *sql.DB) {
 		return
 	}
 
-	_, err = db.Exec(`
+	res, err := db.Exec(`
 		INSERT INTO users (name, email, password, public_id, status, created_at, updated_at)
 		VALUES (?, ?, ?, ?, ?, ?, ?)
 	`, "Superadmin", "admin@gmail.com", string(hashed), uuid.New().String(), 1, time.Now(), time.Now())
@@ -62,6 +62,16 @@ func RunSeed(db *sql.DB) {
 	if err != nil {
 		log.Println("Seed user failed:", err)
 		return
+	}
+
+	userID, err := res.LastInsertId()
+	if err == nil {
+		_, err = db.Exec("INSERT INTO model_has_roles (role_id, model_type, model_id) VALUES (?, 'User', ?)", roleID, userID)
+		if err != nil {
+			log.Println("Failed to assign superadmin role to seeded user:", err)
+		}
+	} else {
+		log.Println("Failed to get last insert ID for user:", err)
 	}
 
 	log.Println("Seeder executed successfully")

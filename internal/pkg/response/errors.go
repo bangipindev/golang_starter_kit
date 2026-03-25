@@ -36,15 +36,16 @@ func (e Error) Error() string {
 var (
 
 	// general
-	ErrNotFound        = errors.New("not found")
-	ErrUnauthorized    = errors.New("unauthorized")
-	ErrForbiddenAccess = errors.New("forbidden access")
-	ErrUserInactive    = errors.New("user is inactive")
-	ErrTokenExpired    = errors.New("token expired or invalid")
-	ErrTokenInvalid    = errors.New("token invalid")
-	ErrTokenNotProvide = errors.New("token not provide")
-	ErrAuthorization   = errors.New("authorization is required")
-	ErrAuthNotValid    = errors.New("authorization is not valid , required bearer token")
+	ErrNotFound              = errors.New("not found")
+	ErrUnauthorized          = errors.New("unauthorized")
+	ErrForbiddenAccess       = errors.New("forbidden access")
+	ErrUserInactive          = errors.New("user is inactive")
+	ErrTokenExpired          = errors.New("token expired or invalid")
+	ErrTokenInvalid          = errors.New("token invalid")
+	ErrTokenNotProvide       = errors.New("token not provide")
+	ErrAuthorization         = errors.New("authorization is required")
+	ErrAuthNotValid          = errors.New("authorization is not valid , required bearer token")
+	ErrPermissionAlreadyUsed = errors.New("permission already used")
 
 	// auth
 	ErrEmailRequired         = errors.New("email is required")
@@ -93,6 +94,7 @@ var (
 	ErrorTokenNotProvide       = NewError(ErrTokenNotProvide.Error(), "401", http.StatusUnauthorized)
 	ErrorAuthorization         = NewError(ErrAuthorization.Error(), "401", http.StatusUnauthorized)
 	ErrorAuthNotValid          = NewError(ErrAuthNotValid.Error(), "401", http.StatusUnauthorized)
+	ErrorPermissionAlreadyUsed = NewError(ErrPermissionAlreadyUsed.Error(), "409", http.StatusConflict)
 )
 
 //
@@ -116,6 +118,7 @@ var ErrorMapping = map[string]Error{
 	ErrTokenNotProvide.Error():       ErrorTokenNotProvide,
 	ErrAuthorization.Error():         ErrorAuthorization,
 	ErrAuthNotValid.Error():          ErrorAuthNotValid,
+	ErrPermissionAlreadyUsed.Error(): ErrorPermissionAlreadyUsed,
 
 	ErrRefreshTokenInvalid.Error(): ErrorRefreshTokenInvalid,
 }

@@ -3,8 +3,8 @@ package main
 import (
 	"gpt/config"
 	"gpt/internal/container"
-	"gpt/internal/delivery/http"
 	"gpt/internal/infrastructure"
+	"gpt/internal/routes"
 	"log"
 	"os"
 	"strings"
@@ -47,7 +47,7 @@ func main() {
 	app.Use(logger.New())
 	app.Use(recover.New())
 
-	http.SetupRoutes(app, cfg, container)
+	routes.SetupRoutes(app, cfg, container)
 
 	// ======================
 	// Start Server

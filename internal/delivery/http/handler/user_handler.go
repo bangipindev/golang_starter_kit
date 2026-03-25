@@ -4,17 +4,16 @@ import (
 	"gpt/internal/delivery/http/dto"
 	"gpt/internal/domain"
 	"gpt/internal/pkg/response"
-	"gpt/internal/usecase"
 	"strconv"
 
 	"github.com/gofiber/fiber/v2"
 )
 
 type UserHandler struct {
-	userUsecase usecase.UserUsecase
+	userUsecase domain.UserUsecase
 }
 
-func NewUserHandler(userUsecase usecase.UserUsecase) *UserHandler {
+func NewUserHandler(userUsecase domain.UserUsecase) *UserHandler {
 	return &UserHandler{
 		userUsecase: userUsecase,
 	}
@@ -105,4 +104,66 @@ func (h *UserHandler) Delete(c *fiber.Ctx) error {
 	}
 
 	return response.SuccessWithStatus(c, fiber.StatusOK, "User deleted successfully", nil)
+}
+
+func (h *UserHandler) AssignRole(c *fiber.Ctx) error {
+	idParam := c.Params("id")
+	userID, err := strconv.ParseInt(idParam, 10, 64)
+	if err != nil {
+		return response.HandleError(c, response.ErrorBadRequest)
+	}
+
+	var req struct {
+		RoleID int64 `json:"role_id"`
+	}
+	if err := c.BodyParser(&req); err != nil {
+		return response.HandleError(c, response.ErrorBadRequest)
+	}
+
+	if err := h.userUsecase.AssignRoleToUser(c.Context(), userID, req.RoleID); err != nil {
+		return response.HandleError(c, err)
+	}
+
+	return response.SuccessWithStatus(c, fiber.StatusOK, "Role assigned successfully", nil)
+}
+
+func (h *UserHandler) AssignPermission(c *fiber.Ctx) error {
+	idParam := c.Params("id")
+	userID, err := strconv.ParseInt(idParam, 10, 64)
+	if err != nil {
+		return response.HandleError(c, response.ErrorBadRequest)
+	}
+
+	var req struct {
+		PermissionID int64 `json:"permission_id"`
+	}
+	if err := c.BodyParser(&req); err != nil {
+		return response.HandleError(c, response.ErrorBadRequest)
+	}
+
+	if err := h.userUsecase.AssignPermissionToUser(c.Context(), userID, req.PermissionID); err != nil {
+		return response.HandleError(c, err)
+	}
+
+	return response.SuccessWithStatus(c, fiber.StatusOK, "Permission assigned successfully", nil)
+}
+
+func (h *UserHandler) GetRolesAndPermissions(c *fiber.Ctx) error {
+	idParam := c.Params("id")
+	userID, err := strconv.ParseInt(idParam, 10, 64)
+	if err != nil {
+		return response.HandleError(c, response.ErrorBadRequest)
+	}
+
+	roles, permissions, err := h.userUsecase.GetRolesAndPermissions(c.Context(), userID)
+	if err != nil {
+		return response.HandleError(c, err)
+	}
+
+	res := dto.UserRolesPermissionsResponse{
+		Roles:       roles,
+		Permissions: permissions,
+	}
+
+	return response.SuccessWithStatus(c, fiber.StatusOK, "Successfully fetched roles and permissions", res)
 }

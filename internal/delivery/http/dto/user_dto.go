@@ -118,3 +118,8 @@ func (r *UserRequest) ToDomain() (*domain.User, error) {
 		// Role:     role,
 	}, nil
 }
+
+type UserRolesPermissionsResponse struct {
+	Roles       []string `json:"roles"`
+	Permissions []string `json:"permissions"`
+}

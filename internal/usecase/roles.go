@@ -6,18 +6,11 @@ import (
 	"gpt/internal/pkg/response"
 )
 
-type RolesUsecase interface {
-	GetAll(ctx context.Context) ([]*domain.Roles, error)
-	Create(ctx context.Context, roles *domain.Roles) error
-	Update(ctx context.Context, role *domain.Roles) error
-	Delete(ctx context.Context, id int64) error
-}
-
 type rolesUsecase struct {
 	rolesRepo domain.RoleRepository
 }
 
-func NewRoleUsecase(repo domain.RoleRepository) RolesUsecase {
+func NewRoleUsecase(repo domain.RoleRepository) domain.RolesUsecase {
 	return &rolesUsecase{
 		rolesRepo: repo,
 	}
@@ -71,4 +64,8 @@ func (s *rolesUsecase) Delete(ctx context.Context, id int64) error {
 	}
 
 	return s.rolesRepo.Delete(ctx, id)
+}
+
+func (s *rolesUsecase) AssignPermissionToRole(ctx context.Context, roleID int64, permissionID int64) error {
+	return s.rolesRepo.AssignPermissionToRole(ctx, roleID, permissionID)
 }

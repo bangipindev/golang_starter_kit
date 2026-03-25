@@ -33,4 +33,17 @@ type UserRepository interface {
 	GetAll(ctx context.Context) ([]*User, error)
 	Update(ctx context.Context, user *User) error
 	Delete(ctx context.Context, id int64) error
+	GetRolesAndPermissions(ctx context.Context, userID int64) ([]string, []string, error)
+	AssignRoleToUser(ctx context.Context, userID int64, roleID int64) error
+	AssignPermissionToUser(ctx context.Context, userID int64, permissionID int64) error
+}
+
+type UserUsecase interface {
+	GetAll(ctx context.Context) ([]*User, error)
+	Create(ctx context.Context, user *User) error
+	Update(ctx context.Context, user *User) (*User, error)
+	Delete(ctx context.Context, id int64) error
+	AssignRoleToUser(ctx context.Context, userID int64, roleID int64) error
+	AssignPermissionToUser(ctx context.Context, userID int64, permissionID int64) error
+	GetRolesAndPermissions(ctx context.Context, userID int64) ([]string, []string, error)
 }

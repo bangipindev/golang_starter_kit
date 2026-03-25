@@ -28,4 +28,13 @@ type RoleRepository interface {
 	GetAll(ctx context.Context) ([]*Roles, error)
 	Update(ctx context.Context, roles *Roles) error
 	Delete(ctx context.Context, id int64) error
+	AssignPermissionToRole(ctx context.Context, roleID int64, permissionID int64) error
+}
+
+type RolesUsecase interface {
+	Create(ctx context.Context, roles *Roles) error
+	GetAll(ctx context.Context) ([]*Roles, error)
+	Update(ctx context.Context, roles *Roles) error
+	Delete(ctx context.Context, id int64) error
+	AssignPermissionToRole(ctx context.Context, roleID int64, permissionID int64) error
 }

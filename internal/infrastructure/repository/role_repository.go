@@ -128,3 +128,9 @@ func (r *roleRepository) Delete(ctx context.Context, id int64) error {
 
 	return nil
 }
+
+func (r *roleRepository) AssignPermissionToRole(ctx context.Context, roleID int64, permissionID int64) error {
+	query := "INSERT INTO role_has_permissions(permission_id, role_id) VALUES (?, ?)"
+	_, err := r.db.ExecContext(ctx, query, permissionID, roleID)
+	return err
+}
