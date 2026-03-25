@@ -1,4 +1,4 @@
-package http
+package routes
 
 import (
 	"gpt/config"
@@ -26,6 +26,7 @@ func SetupRoutes(app *fiber.App, cfg *config.Config, container *base.Container) 
 	userGroup := protected.Group("/users", middleware.RequireRole("admin"))
 	userGroup.Get("/", container.UserHandler.GetAll)
 	userGroup.Post("/add", container.UserHandler.Create)
+	userGroup.Get("/:id/roles-permissions", container.UserHandler.GetRolesAndPermissions)
 	userGroup.Post("/:id/roles", container.UserHandler.AssignRole)
 	userGroup.Post("/:id/permissions", container.UserHandler.AssignPermission)
 	userGroup.Put("/:id", container.UserHandler.Update)

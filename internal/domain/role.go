@@ -31,10 +31,8 @@ type RoleRepository interface {
 	AssignPermissionToRole(ctx context.Context, roleID int64, permissionID int64) error
 }
 
-type RoleUseCase interface {
+type RolesUsecase interface {
 	Create(ctx context.Context, roles *Roles) error
-	FindByID(ctx context.Context, id int64) (*Roles, error)
-	FindByName(ctx context.Context, name string) (*Roles, error)
 	GetAll(ctx context.Context) ([]*Roles, error)
 	Update(ctx context.Context, roles *Roles) error
 	Delete(ctx context.Context, id int64) error

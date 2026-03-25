@@ -4,17 +4,16 @@ import (
 	"gpt/internal/delivery/http/dto"
 	"gpt/internal/domain"
 	"gpt/internal/pkg/response"
-	"gpt/internal/usecase"
 	"strconv"
 
 	"github.com/gofiber/fiber/v2"
 )
 
 type RolesHandler struct {
-	rolesUsecase usecase.RolesUsecase
+	rolesUsecase domain.RolesUsecase
 }
 
-func NewRolesHandler(rolesUsecase usecase.RolesUsecase) *RolesHandler {
+func NewRolesHandler(rolesUsecase domain.RolesUsecase) *RolesHandler {
 	return &RolesHandler{
 		rolesUsecase: rolesUsecase,
 	}

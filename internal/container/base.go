@@ -3,11 +3,11 @@ package container
 import (
 	"database/sql"
 	"gpt/config"
-	"gpt/internal/delivery/http/auth"
 	"gpt/internal/delivery/http/handler"
 	"gpt/internal/domain"
 	"gpt/internal/infrastructure/repository"
 	"gpt/internal/usecase"
+	"gpt/internal/utils/auth"
 )
 
 type Container struct {
