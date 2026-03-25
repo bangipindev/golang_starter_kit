@@ -6,8 +6,10 @@ import (
 )
 
 type JWTAccessClaims struct {
-	PublicId uuid.UUID `json:"public_id"`
-	Name     string    `json:"name"`
+	PublicId    uuid.UUID `json:"public_id"`
+	Name        string    `json:"name"`
+	Roles       []string  `json:"roles"`
+	Permissions []string  `json:"permissions"`
 	jwt.RegisteredClaims
 }
 

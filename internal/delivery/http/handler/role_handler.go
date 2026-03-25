@@ -101,3 +101,24 @@ func (h *RolesHandler) Delete(c *fiber.Ctx) error {
 
 	return response.SuccessWithStatus(c, fiber.StatusOK, "Role deleted successfully", nil)
 }
+
+func (h *RolesHandler) AssignPermission(c *fiber.Ctx) error {
+	idParam := c.Params("id")
+	roleID, err := strconv.ParseInt(idParam, 10, 64)
+	if err != nil {
+		return response.HandleError(c, response.ErrorBadRequest)
+	}
+
+	var req struct {
+		PermissionID int64 `json:"permission_id"`
+	}
+	if err := c.BodyParser(&req); err != nil {
+		return response.HandleError(c, response.ErrorBadRequest)
+	}
+
+	if err := h.rolesUsecase.AssignPermissionToRole(c.Context(), roleID, req.PermissionID); err != nil {
+		return response.HandleError(c, err)
+	}
+
+	return response.SuccessWithStatus(c, fiber.StatusOK, "Permission assigned successfully", nil)
+}

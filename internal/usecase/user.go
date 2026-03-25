@@ -13,6 +13,8 @@ type UserUsecase interface {
 	Create(ctx context.Context, user *domain.User) error
 	Update(ctx context.Context, user *domain.User) (*domain.User, error)
 	Delete(ctx context.Context, id int64) error
+	AssignRoleToUser(ctx context.Context, userID int64, roleID int64) error
+	AssignPermissionToUser(ctx context.Context, userID int64, permissionID int64) error
 }
 
 type userUsecase struct {
@@ -97,4 +99,12 @@ func (u *userUsecase) Delete(ctx context.Context, id int64) error {
 		return response.ErrNotFound
 	}
 	return u.userRepo.Delete(ctx, id)
+}
+
+func (u *userUsecase) AssignRoleToUser(ctx context.Context, userID int64, roleID int64) error {
+	return u.userRepo.AssignRoleToUser(ctx, userID, roleID)
+}
+
+func (u *userUsecase) AssignPermissionToUser(ctx context.Context, userID int64, permissionID int64) error {
+	return u.userRepo.AssignPermissionToUser(ctx, userID, permissionID)
 }

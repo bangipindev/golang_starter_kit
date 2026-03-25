@@ -10,25 +10,12 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-type AuthUsecase interface {
-	Register(ctx context.Context, user *domain.User) error
-	Login(ctx context.Context, email, password string) (*LoginResponse, error)
-	GetProfile(ctx context.Context, public_id uuid.UUID) (*domain.User, error)
-	RefreshToken(ctx context.Context, refreshToken string) (string, error)
-}
-
 type authUsecase struct {
 	userRepo domain.UserRepository
 	tokenSvc domain.TokenService
 }
 
-type LoginResponse struct {
-	User         *domain.User
-	AccessToken  string
-	RefreshToken string
-}
-
-func NewAuthUsecase(repo domain.UserRepository, tokenSvc domain.TokenService) AuthUsecase {
+func NewAuthUsecase(repo domain.UserRepository, tokenSvc domain.TokenService) domain.AuthUsecase {
 	return &authUsecase{
 		userRepo: repo,
 		tokenSvc: tokenSvc,
@@ -56,7 +43,7 @@ func (s *authUsecase) Register(ctx context.Context, user *domain.User) error {
 	return s.userRepo.Create(ctx, user)
 }
 
-func (s *authUsecase) Login(ctx context.Context, email, password string) (*LoginResponse, error) {
+func (s *authUsecase) Login(ctx context.Context, email, password string) (*domain.LoginResponse, error) {
 	user, err := s.userRepo.FindByEmail(ctx, email)
 	if err != nil {
 		return nil, response.ErrNotFound
@@ -68,6 +55,12 @@ func (s *authUsecase) Login(ctx context.Context, email, password string) (*Login
 
 	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password)); err != nil {
 		return nil, response.ErrPasswordNotMatch
+	}
+
+	roles, permissions, errPerm := s.userRepo.GetRolesAndPermissions(ctx, user.ID)
+	if errPerm == nil {
+		user.Roles = roles
+		user.Permissions = permissions
 	}
 
 	accessToken, err := s.tokenSvc.GenerateAccessToken(user)
@@ -82,7 +75,7 @@ func (s *authUsecase) Login(ctx context.Context, email, password string) (*Login
 
 	user.Password = ""
 
-	return &LoginResponse{
+	return &domain.LoginResponse{
 		User:         user,
 		AccessToken:  accessToken,
 		RefreshToken: refreshToken,
@@ -108,6 +101,12 @@ func (s *authUsecase) RefreshToken(ctx context.Context, refreshToken string) (st
 	user, err := s.userRepo.FindByPublicID(ctx, publicId)
 	if err != nil {
 		return "", response.ErrNotFound
+	}
+
+	roles, permissions, errPerm := s.userRepo.GetRolesAndPermissions(ctx, user.ID)
+	if errPerm == nil {
+		user.Roles = roles
+		user.Permissions = permissions
 	}
 
 	return s.tokenSvc.GenerateAccessToken(user)

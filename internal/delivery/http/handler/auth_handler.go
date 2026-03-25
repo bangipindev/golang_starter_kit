@@ -4,7 +4,6 @@ import (
 	"gpt/internal/delivery/http/dto"
 	"gpt/internal/domain"
 	"gpt/internal/pkg/response"
-	"gpt/internal/usecase"
 
 	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v2"
@@ -12,10 +11,10 @@ import (
 )
 
 type AuthHandler struct {
-	authUsecase usecase.AuthUsecase
+	authUsecase domain.AuthUsecase
 }
 
-func NewAuthHandler(authUsecase usecase.AuthUsecase) *AuthHandler {
+func NewAuthHandler(authUsecase domain.AuthUsecase) *AuthHandler {
 	return &AuthHandler{
 		authUsecase: authUsecase,
 	}

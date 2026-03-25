@@ -15,7 +15,7 @@ type userRepository struct {
 }
 
 func NewUserRepository(db *sql.DB) domain.UserRepository {
-	return &userRepository{db}
+	return &userRepository{db: db}
 }
 
 func (r *userRepository) GetAll(ctx context.Context) ([]*domain.User, error) {
@@ -133,4 +133,60 @@ func (r *userRepository) FindByPublicID(ctx context.Context, PublicId uuid.UUID)
 	}
 
 	return &user, nil
+}
+
+func (r *userRepository) GetRolesAndPermissions(ctx context.Context, userID int64) ([]string, []string, error) {
+	var roles []string
+	var permissions []string
+
+	roleQuery := `
+		SELECT r.name FROM roles r
+		JOIN model_has_roles mr ON r.id = mr.role_id
+		WHERE mr.model_id = ?`
+
+	rows, err := r.db.QueryContext(ctx, roleQuery, userID)
+	if err == nil {
+		defer rows.Close()
+		for rows.Next() {
+			var roleName string
+			if err := rows.Scan(&roleName); err == nil {
+				roles = append(roles, roleName)
+			}
+		}
+	}
+
+	permQuery := `
+		SELECT DISTINCT p.name FROM permissions p
+		JOIN role_has_permissions rp ON p.id = rp.permission_id
+		JOIN model_has_roles mr ON rp.role_id = mr.role_id
+		WHERE mr.model_id = ?
+		UNION
+		SELECT p.name FROM permissions p
+		JOIN model_has_permissions mp ON p.id = mp.permission_id
+		WHERE mp.model_id = ?`
+
+	permRows, err := r.db.QueryContext(ctx, permQuery, userID, userID)
+	if err == nil {
+		defer permRows.Close()
+		for permRows.Next() {
+			var permName string
+			if err := permRows.Scan(&permName); err == nil {
+				permissions = append(permissions, permName)
+			}
+		}
+	}
+
+	return roles, permissions, nil
+}
+
+func (r *userRepository) AssignRoleToUser(ctx context.Context, userID int64, roleID int64) error {
+	query := "INSERT INTO model_has_roles(role_id, model_type, model_id) VALUES (?, 'User', ?)"
+	_, err := r.db.ExecContext(ctx, query, roleID, userID)
+	return err
+}
+
+func (r *userRepository) AssignPermissionToUser(ctx context.Context, userID int64, permissionID int64) error {
+	query := "INSERT INTO model_has_permissions(permission_id, model_type, model_id) VALUES (?, 'User', ?)"
+	_, err := r.db.ExecContext(ctx, query, permissionID, userID)
+	return err
 }

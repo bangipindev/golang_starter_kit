@@ -21,8 +21,10 @@ type User struct {
 	Password  string
 	PublicId  uuid.UUID
 	Status    StatusUser
-	CreatedAt time.Time
-	UpdatedAt time.Time
+	CreatedAt   time.Time
+	UpdatedAt   time.Time
+	Roles       []string
+	Permissions []string
 }
 
 type UserRepository interface {
@@ -33,4 +35,12 @@ type UserRepository interface {
 	GetAll(ctx context.Context) ([]*User, error)
 	Update(ctx context.Context, user *User) error
 	Delete(ctx context.Context, id int64) error
+	GetRolesAndPermissions(ctx context.Context, userID int64) ([]string, []string, error)
+	AssignRoleToUser(ctx context.Context, userID int64, roleID int64) error
+	AssignPermissionToUser(ctx context.Context, userID int64, permissionID int64) error
+}
+
+type UserUseCase interface {
+	AssignRoleToUser(ctx context.Context, userID int64, roleID int64) error
+	AssignPermissionToUser(ctx context.Context, userID int64, permissionID int64) error
 }
