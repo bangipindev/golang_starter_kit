@@ -57,12 +57,6 @@ func (s *authUsecase) Login(ctx context.Context, email, password string) (*domai
 		return nil, response.ErrPasswordNotMatch
 	}
 
-	roles, permissions, errPerm := s.userRepo.GetRolesAndPermissions(ctx, user.ID)
-	if errPerm == nil {
-		user.Roles = roles
-		user.Permissions = permissions
-	}
-
 	accessToken, err := s.tokenSvc.GenerateAccessToken(user)
 	if err != nil {
 		return nil, err
@@ -101,12 +95,6 @@ func (s *authUsecase) RefreshToken(ctx context.Context, refreshToken string) (st
 	user, err := s.userRepo.FindByPublicID(ctx, publicId)
 	if err != nil {
 		return "", response.ErrNotFound
-	}
-
-	roles, permissions, errPerm := s.userRepo.GetRolesAndPermissions(ctx, user.ID)
-	if errPerm == nil {
-		user.Roles = roles
-		user.Permissions = permissions
 	}
 
 	return s.tokenSvc.GenerateAccessToken(user)

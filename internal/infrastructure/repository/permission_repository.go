@@ -5,6 +5,8 @@ import (
 	"database/sql"
 	"gpt/internal/domain"
 	"time"
+
+	"github.com/google/uuid"
 )
 
 type PermissionRepository struct {
@@ -74,4 +76,81 @@ func (r *PermissionRepository) Update(ctx context.Context, permission *domain.Pe
 func (r *PermissionRepository) Delete(ctx context.Context, id string) error {
 	_, err := r.db.ExecContext(ctx, "DELETE FROM permissions WHERE id = ?", id)
 	return err
+}
+
+func (r *PermissionRepository) GetUserByPublicID(PublicId uuid.UUID) (*domain.User, error) {
+	row := r.db.QueryRow(
+		"SELECT id,name,email,password,public_id,status,created_at,updated_at FROM users WHERE public_id=?",
+		PublicId,
+	)
+
+	var user domain.User
+	err := row.Scan(&user.ID, &user.Name, &user.Email, &user.Password, &user.PublicId, &user.Status, &user.CreatedAt, &user.UpdatedAt)
+	if err != nil {
+		return nil, err
+	}
+
+	return &user, nil
+}
+
+// Ambil semua permission dari role + user override
+func (r *PermissionRepository) GetUserPermissions(ctx context.Context, UserId int64) ([]string, error) {
+	query := `
+		SELECT p.name
+		FROM permissions p
+		JOIN role_has_permissions rhp ON rhp.permission_id = p.id
+		JOIN model_has_roles mhr ON mhr.role_id = rhp.role_id
+		WHERE mhr.model_id = ?
+
+		UNION
+
+		SELECT p.name
+		FROM permissions p
+		JOIN model_has_permissions mhp ON mhp.permission_id = p.id
+		WHERE mhp.model_id = ?
+	`
+
+	rows, err := r.db.QueryContext(ctx, query, UserId, UserId)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var permissions []string
+	for rows.Next() {
+		var p string
+		if err := rows.Scan(&p); err != nil {
+			return nil, err
+		}
+		permissions = append(permissions, p)
+	}
+
+	return permissions, nil
+}
+
+// Ambil roles user
+func (r *PermissionRepository) GetUserRoles(ctx context.Context, UserId int64) ([]string, error) {
+	query := `
+		SELECT r.name
+		FROM roles r
+		JOIN model_has_roles mhr ON mhr.role_id = r.id
+		WHERE mhr.model_id = ?
+	`
+
+	rows, err := r.db.QueryContext(ctx, query, UserId)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var roles []string
+	for rows.Next() {
+		var rname string
+		if err := rows.Scan(&rname); err != nil {
+			return nil, err
+		}
+		roles = append(roles, rname)
+	}
+
+	return roles, nil
 }

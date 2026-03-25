@@ -15,16 +15,14 @@ const (
 )
 
 type User struct {
-	ID          int64
-	Name        string
-	Email       string
-	Password    string
-	PublicId    uuid.UUID
-	Status      StatusUser
-	CreatedAt   time.Time
-	UpdatedAt   time.Time
-	Roles       []string
-	Permissions []string
+	ID        int64
+	Name      string
+	Email     string
+	Password  string
+	PublicId  uuid.UUID
+	Status    StatusUser
+	CreatedAt time.Time
+	UpdatedAt time.Time
 }
 
 type UserRepository interface {

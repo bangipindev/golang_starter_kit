@@ -23,7 +23,7 @@ func SetupRoutes(app *fiber.App, cfg *config.Config, container *base.Container) 
 	// =====================
 	// User Routes
 	// =====================
-	userGroup := protected.Group("/users", middleware.RequireRole("admin"))
+	userGroup := protected.Group("/users", middleware.RequireRole("admin", container.PermitRbac))
 	userGroup.Get("/", container.UserHandler.GetAll)
 	userGroup.Post("/add", container.UserHandler.Create)
 	userGroup.Get("/:id/roles-permissions", container.UserHandler.GetRolesAndPermissions)
@@ -42,18 +42,18 @@ func SetupRoutes(app *fiber.App, cfg *config.Config, container *base.Container) 
 	// Role Routes
 	// =====================
 	roleGroup := protected.Group("/roles")
-	roleGroup.Get("/", middleware.RequirePermission("view_roles"), container.RoleHandler.GetAll)
-	roleGroup.Post("/add", middleware.RequirePermission("create_roles"), container.RoleHandler.Create)
-	roleGroup.Post("/:id/permissions", middleware.RequirePermission("edit_roles"), container.RoleHandler.AssignPermission)
-	roleGroup.Put("/:id", middleware.RequirePermission("edit_roles"), container.RoleHandler.Update)
-	roleGroup.Delete("/:id", middleware.RequirePermission("delete_roles"), container.RoleHandler.Delete)
+	roleGroup.Get("/", middleware.RequirePermission("view_roles", container.PermitRbac), container.RoleHandler.GetAll)
+	roleGroup.Post("/add", middleware.RequirePermission("create_roles", container.PermitRbac), container.RoleHandler.Create)
+	roleGroup.Post("/:id/permissions", middleware.RequirePermission("edit_roles", container.PermitRbac), container.RoleHandler.AssignPermission)
+	roleGroup.Put("/:id", middleware.RequirePermission("edit_roles", container.PermitRbac), container.RoleHandler.Update)
+	roleGroup.Delete("/:id", middleware.RequirePermission("delete_roles", container.PermitRbac), container.RoleHandler.Delete)
 
 	// =====================
 	// Permission Routes
 	// =====================
 	permissionGroup := protected.Group("/permission")
-	permissionGroup.Get("/", middleware.RequirePermission("view_permissions"), container.PermissionHandler.GetAll)
-	permissionGroup.Post("/add", middleware.RequirePermission("create_permissions"), container.PermissionHandler.Create)
-	permissionGroup.Put("/:id", middleware.RequirePermission("edit_permissions"), container.PermissionHandler.Update)
-	permissionGroup.Delete("/:id", middleware.RequirePermission("delete_permissions"), container.PermissionHandler.Delete)
+	permissionGroup.Get("/", middleware.RequirePermission("view_permissions", container.PermitRbac), container.PermissionHandler.GetAll)
+	permissionGroup.Post("/add", middleware.RequirePermission("create_permissions", container.PermitRbac), container.PermissionHandler.Create)
+	permissionGroup.Put("/:id", middleware.RequirePermission("edit_permissions", container.PermitRbac), container.PermissionHandler.Update)
+	permissionGroup.Delete("/:id", middleware.RequirePermission("delete_permissions", container.PermitRbac), container.PermissionHandler.Delete)
 }

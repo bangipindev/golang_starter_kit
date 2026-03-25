@@ -11,12 +11,13 @@ import (
 )
 
 type Container struct {
-	AuthHandler       *handler.AuthHandler
 	TokenService      domain.TokenService
+	UserRepo          domain.UserRepository
+	PermitRbac        domain.PermissionUseCase
+	AuthHandler       *handler.AuthHandler
 	RoleHandler       *handler.RolesHandler
 	UserHandler       *handler.UserHandler
 	PermissionHandler *handler.PermissionHandler
-	UserRepo          domain.UserRepository
 }
 
 func NewContainer(db *sql.DB, cfg *config.Config) *Container {
@@ -29,11 +30,13 @@ func NewContainer(db *sql.DB, cfg *config.Config) *Container {
 	authUsecase := usecase.NewAuthUsecase(userRepo, jwtService)
 	roleUsecase := usecase.NewRoleUsecase(roleRepo)
 	userUsecase := usecase.NewUserUsecase(userRepo)
+	permitRbac := usecase.NewPermissionUseCase(permissionRepo)
 	permissionUsecase := usecase.NewPermissionUseCase(permissionRepo)
 
 	return &Container{
 		TokenService:      jwtService,
 		UserRepo:          userRepo,
+		PermitRbac:        permitRbac,
 		AuthHandler:       handler.NewAuthHandler(authUsecase),
 		RoleHandler:       handler.NewRolesHandler(roleUsecase),
 		UserHandler:       handler.NewUserHandler(userUsecase),

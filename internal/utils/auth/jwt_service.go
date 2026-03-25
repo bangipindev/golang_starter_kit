@@ -25,10 +25,8 @@ func NewJWTService(secret string, accessExpiry, refreshExpiry time.Duration) *JW
 
 func (j *JWTService) GenerateAccessToken(user *domain.User) (string, error) {
 	claims := token.JWTAccessClaims{
-		PublicId:    user.PublicId,
-		Name:        user.Name,
-		Roles:       user.Roles,
-		Permissions: user.Permissions,
+		PublicId: user.PublicId,
+		Name:     user.Name,
 		RegisteredClaims: jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(time.Now().Add(j.accessExpiry)),
 			IssuedAt:  jwt.NewNumericDate(time.Now()),
@@ -94,9 +92,7 @@ func (j *JWTService) ParseAccessToken(tokenString string) (*domain.AccessClaims,
 
 	// convert ke domain claims
 	return &domain.AccessClaims{
-		PublicId:    jwtClaims.PublicId,
-		Name:        jwtClaims.Name,
-		Roles:       jwtClaims.Roles,
-		Permissions: jwtClaims.Permissions,
+		PublicId: jwtClaims.PublicId,
+		Name:     jwtClaims.Name,
 	}, nil
 }
